@@ -1,0 +1,174 @@
+// SPDX-License-Identifier: MIT
+
+#pragma warning disable CA1707 // Identifiers should not contain underscores
+
+using System.Linq;
+using System.Threading.Tasks;
+
+using FluentAssertions;
+
+using NixSearch.MCP.Models;
+
+namespace NixSearch.MCP.Tests.Integration;
+
+/// <summary>
+/// Integration tests for <see cref="Tools.SearchPackagesTool"/>.
+/// </summary>
+public class SearchPackagesToolIntegrationTests : IntegrationTestBase
+{
+    /// <summary>
+    /// Tests that SearchPackages with a common package name returns results.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Fact(Timeout = 30000)]
+    public async Task SearchPackages_WithCommonPackage_ShouldReturnResults()
+    {
+        // Act
+        SearchResponse<PackageResult> result = await this.SearchPackagesTool.SearchPackages(
+            "firefox",
+            size: 10,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Total.Should().BeGreaterThan(0);
+        result.Results.Should().NotBeEmpty();
+        result.Results.Should().Contain(p => p.Name
+            .Contains("firefox", System.StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Tests that SearchPackages with pagination works correctly.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Fact(Timeout = 30000)]
+    public async Task SearchPackages_WithPagination_ShouldReturnCorrectPage()
+    {
+        // Act
+        SearchResponse<PackageResult> page0 = await this.SearchPackagesTool.SearchPackages(
+            "python",
+            page: 0,
+            size: 5,
+            cancellationToken: TestContext.Current.CancellationToken);
+        SearchResponse<PackageResult> page1 = await this.SearchPackagesTool.SearchPackages(
+            "python",
+            page: 1,
+            size: 5,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        page0.Should().NotBeNull();
+        page0.Results.Should().HaveCount(5);
+        page0.Page.Should().Be(0);
+
+        page1.Should().NotBeNull();
+        page1.Results.Should().HaveCount(5);
+        page1.Page.Should().Be(1);
+
+        // Results should be different
+        page0.Results[0].AttrName.Should().NotBe(page1.Results[0].AttrName);
+    }
+
+    /// <summary>
+    /// Tests that SearchPackages with platform filter works.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Fact(Timeout = 30000)]
+    public async Task SearchPackages_WithPlatformFilter_ShouldReturnFilteredResults()
+    {
+        // Act
+        SearchResponse<PackageResult> result = await this.SearchPackagesTool.SearchPackages(
+            "git",
+            platform: ["x86_64-linux"],
+            size: 10,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Results.Should().NotBeEmpty();
+        result.Results.Should().OnlyContain(p => p.Platforms.Contains("x86_64-linux"));
+    }
+
+    /// <summary>
+    /// Tests that SearchPackages with stable channel works.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Fact(Timeout = 30000)]
+    public async Task SearchPackages_WithStableChannel_ShouldReturnResults()
+    {
+        // Act
+        SearchResponse<PackageResult> result = await this.SearchPackagesTool.SearchPackages(
+            "bash",
+            channel: "stable",
+            size: 5,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Results.Should().NotBeEmpty();
+    }
+
+    /// <summary>
+    /// Tests that SearchPackages with nonexistent package returns empty.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Fact(Timeout = 30000)]
+    public async Task SearchPackages_WithNonexistentPackage_ShouldReturnEmpty()
+    {
+        // Act
+        SearchResponse<PackageResult> result = await this.SearchPackagesTool.SearchPackages(
+            "this-package-definitely-does-not-exist-xyz123",
+            size: 10,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Total.Should().Be(0);
+        result.Results.Should().BeEmpty();
+    }
+
+    /// <summary>
+    /// Tests that SearchPackages with packageSet filter works.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Fact(Timeout = 30000)]
+    public async Task SearchPackages_WithPackageSetFilter_ShouldReturnFilteredResults()
+    {
+        // Act
+        SearchResponse<PackageResult> result = await this.SearchPackagesTool.SearchPackages(
+            "zfs",
+            packageSet: ["linuxKernel"],
+            size: 10,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Results.Should().NotBeEmpty();
+        result.Results.Should().Contain(p => p.AttrSet == "linuxKernel");
+    }
+
+    /// <summary>
+    /// Tests that SearchPackages returns all expected fields.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Fact(Timeout = 30000)]
+    public async Task SearchPackages_ShouldReturnAllFields()
+    {
+        // Act
+        SearchResponse<PackageResult> result = await this.SearchPackagesTool.SearchPackages(
+            "nginx",
+            size: 1,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Results.Should().NotBeEmpty();
+
+        PackageResult package = result.Results[0];
+        package.AttrName.Should().NotBeNullOrEmpty();
+        package.Name.Should().NotBeNullOrEmpty();
+        package.Version.Should().NotBeNullOrEmpty();
+        package.System.Should().NotBeNullOrEmpty();
+        package.Platforms.Should().NotBeNull();
+    }
+}
