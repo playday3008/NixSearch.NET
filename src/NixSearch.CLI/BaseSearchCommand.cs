@@ -18,6 +18,54 @@ public abstract class BaseSearchCommand<T>
     where T : class
 {
     /// <summary>
+    /// Parses the channel string into a NixChannel enum.
+    /// </summary>
+    /// <param name="channel">The channel string to parse.</param>
+    /// <returns>The parsed NixChannel.</returns>
+    internal static NixChannel ParseChannel(string channel)
+    {
+        return channel.ToLowerInvariant() switch
+        {
+            "unstable" => NixChannel.Unstable,
+            "stable" => NixChannel.Stable,
+            "flakes" => NixChannel.Flakes,
+            _ => throw new ArgumentException($"Invalid channel: {channel}. Valid values are: unstable, stable, flakes"),
+        };
+    }
+
+    /// <summary>
+    /// Parses the sort string into a SortOrder enum.
+    /// </summary>
+    /// <param name="sort">The sort string to parse.</param>
+    /// <returns>The parsed SortOrder, or null for relevance sorting.</returns>
+    internal static SortOrder? ParseSortOrder(string? sort)
+    {
+        return sort?.ToLowerInvariant() switch
+        {
+            "asc" => SortOrder.Ascending,
+            "desc" => SortOrder.Descending,
+            null => null,
+            _ => throw new ArgumentException($"Invalid sort order: {sort}. Valid values are: asc, desc, or omit for relevance sorting"),
+        };
+    }
+
+    /// <summary>
+    /// Creates the appropriate formatter based on the output format.
+    /// </summary>
+    /// <param name="format">The output format.</param>
+    /// <returns>The formatter instance.</returns>
+    internal static IOutputFormatter<T> CreateFormatter(OutputFormat format)
+    {
+        return format switch
+        {
+            OutputFormat.Json => new JsonOutputFormatter<T>(),
+            OutputFormat.Yaml => new YamlOutputFormatter<T>(),
+            OutputFormat.Xml => new XmlOutputFormatter<T>(),
+            _ => new TextOutputFormatter<T>(),
+        };
+    }
+
+    /// <summary>
     /// Creates the command with common and specific options.
     /// </summary>
     /// <param name="name">The command name.</param>
@@ -124,48 +172,6 @@ public abstract class BaseSearchCommand<T>
         int from,
         int size,
         SortOrder? sortOrder);
-
-    /// <summary>
-    /// Parses the channel string into a NixChannel enum.
-    /// </summary>
-    private static NixChannel ParseChannel(string channel)
-    {
-        return channel.ToLowerInvariant() switch
-        {
-            "unstable" => NixChannel.Unstable,
-            "stable" => NixChannel.Stable,
-            "flakes" => NixChannel.Flakes,
-            _ => throw new ArgumentException($"Invalid channel: {channel}. Valid values are: unstable, stable, flakes"),
-        };
-    }
-
-    /// <summary>
-    /// Parses the sort string into a SortOrder enum.
-    /// </summary>
-    private static SortOrder? ParseSortOrder(string? sort)
-    {
-        return sort?.ToLowerInvariant() switch
-        {
-            "asc" => SortOrder.Ascending,
-            "desc" => SortOrder.Descending,
-            null => null,
-            _ => throw new ArgumentException($"Invalid sort order: {sort}. Valid values are: asc, desc, or omit for relevance sorting"),
-        };
-    }
-
-    /// <summary>
-    /// Creates the appropriate formatter based on the output format.
-    /// </summary>
-    private static IOutputFormatter<T> CreateFormatter(OutputFormat format)
-    {
-        return format switch
-        {
-            OutputFormat.Json => new JsonOutputFormatter<T>(),
-            OutputFormat.Yaml => new YamlOutputFormatter<T>(),
-            OutputFormat.Xml => new XmlOutputFormatter<T>(),
-            _ => new TextOutputFormatter<T>(),
-        };
-    }
 
     /// <summary>
     /// Executes the search command.

@@ -27,6 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="NixSearch.CLI.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../NixSearch.Core/NixSearch.Core.csproj" />
   </ItemGroup>
 
