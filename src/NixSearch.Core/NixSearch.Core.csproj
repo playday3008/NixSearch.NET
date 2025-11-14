@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../../common.props" />
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>NixSearch.Core</PackageId>
+    <Description>A .NET client library for searching Nix packages, options, and flakes using the search.nixos.org Elasticsearch backend.</Description>
+    <PackageTags>nix;nixos;nixpkgs;search;elasticsearch</PackageTags>
+    <PackageProjectUrl>https://github.com/playday3008/NixSearch.NET</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/playday3008/NixSearch.NET</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NEST" Version="7.13.2" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.11" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="NixSearch.Core.Tests" />
+  </ItemGroup>
+
+</Project>
