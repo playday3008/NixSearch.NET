@@ -10,13 +10,6 @@ namespace NixSearch.Core.Models.Package;
 public sealed record Maintainer
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Maintainer"/> class.
-    /// </summary>
-    public Maintainer()
-    {
-    }
-
-    /// <summary>
     /// Gets the maintainer's name.
     /// </summary>
     [PropertyName("name")]

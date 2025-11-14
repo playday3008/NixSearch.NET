@@ -10,13 +10,6 @@ namespace NixSearch.Core.Models.Package;
 public sealed record License
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="License"/> class.
-    /// </summary>
-    public License()
-    {
-    }
-
-    /// <summary>
     /// Gets the license URL.
     /// </summary>
     [PropertyName("url")]

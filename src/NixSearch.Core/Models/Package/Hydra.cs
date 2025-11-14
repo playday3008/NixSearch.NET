@@ -10,13 +10,6 @@ namespace NixSearch.Core.Models.Package;
 public sealed record Hydra
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Hydra"/> class.
-    /// </summary>
-    public Hydra()
-    {
-    }
-
-    /// <summary>
     /// Gets the build ID.
     /// </summary>
     [PropertyName("build_id")]

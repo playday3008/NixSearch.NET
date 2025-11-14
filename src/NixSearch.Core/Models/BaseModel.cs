@@ -14,13 +14,6 @@ namespace NixSearch.Core.Models;
 public abstract record BaseModel
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="BaseModel"/> class.
-    /// </summary>
-    public BaseModel()
-    {
-    }
-
-    /// <summary>
     /// Get `Name` property of `PropertyName` attribute by property with such attribute.
     /// </summary>
     /// <typeparam name="T">Type of the class.</typeparam>

@@ -10,13 +10,6 @@ namespace NixSearch.Core.Models;
 public record NixOption : NixFlake
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="NixOption"/> class.
-    /// </summary>
-    public NixOption()
-    {
-    }
-
-    /// <summary>
     /// Gets the option name.
     /// </summary>
     [PropertyName("option_name")]

@@ -10,13 +10,6 @@ namespace NixSearch.Core.Models.Package;
 public sealed record HydraPath
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="HydraPath"/> class.
-    /// </summary>
-    public HydraPath()
-    {
-    }
-
-    /// <summary>
     /// Gets the output name.
     /// </summary>
     [PropertyName("output")]

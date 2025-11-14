@@ -12,13 +12,6 @@ namespace NixSearch.Core.Models.Flake;
 public record Repo
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Repo"/> class.
-    /// </summary>
-    public Repo()
-    {
-    }
-
-    /// <summary>
     /// Gets the type of the repository.
     /// </summary>
     [PropertyName("type")]

@@ -12,13 +12,6 @@ namespace NixSearch.Core.Models;
 public abstract record NixFlake : BaseModel
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="NixFlake"/> class.
-    /// </summary>
-    public NixFlake()
-    {
-    }
-
-    /// <summary>
     /// Gets the flake description.
     /// </summary>
     [PropertyName("flake_description")]

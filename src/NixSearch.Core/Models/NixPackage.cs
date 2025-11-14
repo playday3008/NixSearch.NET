@@ -12,13 +12,6 @@ namespace NixSearch.Core.Models;
 public record NixPackage : NixFlake
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="NixPackage"/> class.
-    /// </summary>
-    public NixPackage()
-    {
-    }
-
-    /// <summary>
     /// Gets the package attribute name.
     /// </summary>
     [PropertyName("package_attr_name")]

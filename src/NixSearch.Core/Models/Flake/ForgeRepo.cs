@@ -8,13 +8,6 @@ namespace NixSearch.Core.Models.Flake;
 public record ForgeRepo : Repo
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ForgeRepo"/> class.
-    /// </summary>
-    public ForgeRepo()
-    {
-    }
-
-    /// <summary>
     /// Gets the repository owner.
     /// </summary>
     public new required string Owner { get; init; }

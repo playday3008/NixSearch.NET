@@ -10,13 +10,6 @@ namespace NixSearch.Core.Models.Package;
 public sealed record Team
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Team"/> class.
-    /// </summary>
-    public Team()
-    {
-    }
-
-    /// <summary>
     /// Gets the team members.
     /// </summary>
     [PropertyName("members")]
