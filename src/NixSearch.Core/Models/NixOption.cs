@@ -56,5 +56,5 @@ public record NixOption : NixFlake
     /// Gets the flake information (flake name and module path).
     /// </summary>
     [PropertyName("option_flake")]
-    public required Union<string?, string[]> Flake { get; init; }
+    public Union<string?, string[]>? Flake { get; init; }
 }

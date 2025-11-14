@@ -186,7 +186,7 @@ public sealed class NixOptionIntegrationTests : IntegrationTestBase
 
         // Assert - Find an option with flake information
         NixOption? optionWithFlake = response.Documents
-            .FirstOrDefault(o => o.Flake.Match(f => f != null, s => s != null));
+            .FirstOrDefault(o => o.Flake != null && o.Flake.Match(f => f != null, s => s != null));
 
         Assert.SkipWhen(optionWithFlake == null, "No option with flake information found in the results.");
 
