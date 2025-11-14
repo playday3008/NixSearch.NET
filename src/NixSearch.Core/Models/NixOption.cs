@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: MIT
 
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
+
 using Nest;
+
+using YamlDotNet.Serialization;
 
 namespace NixSearch.Core.Models;
 
@@ -48,6 +53,12 @@ public record NixOption : NixFlake
     /// <summary>
     /// Gets the flake information (flake name and module path).
     /// </summary>
+    /// <remarks>
+    /// This property is ignored during serialization.
+    /// </remarks>
     [PropertyName("option_flake")]
+    [XmlIgnore]
+    [YamlIgnore]
+    [JsonIgnore]
     public Union<string?, string[]>? Flake { get; init; }
 }

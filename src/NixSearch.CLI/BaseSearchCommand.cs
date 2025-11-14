@@ -1,0 +1,201 @@
+// SPDX-License-Identifier: MIT
+
+using System;
+using System.CommandLine;
+
+using Nest;
+
+using NixSearch.CLI.Formatters;
+using NixSearch.Core.Search;
+
+namespace NixSearch.CLI;
+
+/// <summary>
+/// Base class for search commands with common options and logic.
+/// </summary>
+/// <typeparam name="T">The type of search result.</typeparam>
+public abstract class BaseSearchCommand<T>
+    where T : class
+{
+    /// <summary>
+    /// Creates the command with common and specific options.
+    /// </summary>
+    /// <param name="name">The command name.</param>
+    /// <param name="description">The command description.</param>
+    /// <returns>The configured command.</returns>
+    protected Command CreateCommand(string name, string description)
+    {
+        // Required argument
+        Argument<string> queryArgument = new("query")
+        {
+            Description = "The search query",
+        };
+
+        // Common options
+        Option<string> channelOption = new("--channel")
+        {
+            Description = "The NixOS channel to search (unstable, stable, flakes)",
+            DefaultValueFactory = _ => "unstable",
+        };
+
+        Option<int> fromOption = new("--from")
+        {
+            Description = "Starting offset for pagination (0-based)",
+            DefaultValueFactory = _ => 0,
+        };
+
+        Option<int> sizeOption = new("--size")
+        {
+            Description = "Number of results to return",
+            DefaultValueFactory = _ => 50,
+        };
+
+        Option<string?> sortOption = new("--sort")
+        {
+            Description = "Sort order (asc or desc, null for relevance)",
+        };
+
+        Option<OutputFormat> formatOption = new("--format")
+        {
+            Description = "Output format (text, json, yaml, xml)",
+            DefaultValueFactory = _ => OutputFormat.Text,
+        };
+
+        Option<bool> detailedOption = new("--detailed")
+        {
+            Description = "Show detailed output (for text format)",
+            DefaultValueFactory = _ => false,
+        };
+
+        Command command = new(name, description)
+        {
+            queryArgument,
+            channelOption,
+            fromOption,
+            sizeOption,
+            sortOption,
+            formatOption,
+            detailedOption,
+        };
+
+        // Add command-specific options
+        this.AddSpecificOptions(command);
+
+        command.SetAction((parseResult) =>
+        {
+            var query = parseResult.GetValue(queryArgument);
+            var channel = parseResult.GetValue(channelOption);
+            var from = parseResult.GetValue(fromOption);
+            var size = parseResult.GetValue(sizeOption);
+            var sort = parseResult.GetValue(sortOption);
+            var format = parseResult.GetValue(formatOption);
+            var detailed = parseResult.GetValue(detailedOption);
+
+            this.Execute(parseResult, query!, channel!, from, size, sort, format, detailed);
+        });
+
+        return command;
+    }
+
+    /// <summary>
+    /// Allows derived classes to add command-specific options.
+    /// </summary>
+    /// <param name="command">The command to add options to.</param>
+    protected virtual void AddSpecificOptions(Command command)
+    {
+    }
+
+    /// <summary>
+    /// Executes the specific search logic.
+    /// </summary>
+    /// <param name="parseResult">The parse result for accessing command-specific options.</param>
+    /// <param name="client">The NixSearch client.</param>
+    /// <param name="query">The search query.</param>
+    /// <param name="channel">The NixOS channel.</param>
+    /// <param name="from">The starting offset.</param>
+    /// <param name="size">The number of results.</param>
+    /// <param name="sortOrder">The sort order.</param>
+    /// <returns>The search response.</returns>
+    protected abstract ISearchResponse<T> ExecuteSearch(
+        ParseResult parseResult,
+        INixSearchClient client,
+        string query,
+        NixChannel channel,
+        int from,
+        int size,
+        SortOrder? sortOrder);
+
+    /// <summary>
+    /// Parses the channel string into a NixChannel enum.
+    /// </summary>
+    private static NixChannel ParseChannel(string channel)
+    {
+        return channel.ToLowerInvariant() switch
+        {
+            "unstable" => NixChannel.Unstable,
+            "stable" => NixChannel.Stable,
+            "flakes" => NixChannel.Flakes,
+            _ => throw new ArgumentException($"Invalid channel: {channel}. Valid values are: unstable, stable, flakes"),
+        };
+    }
+
+    /// <summary>
+    /// Parses the sort string into a SortOrder enum.
+    /// </summary>
+    private static SortOrder? ParseSortOrder(string? sort)
+    {
+        return sort?.ToLowerInvariant() switch
+        {
+            "asc" => SortOrder.Ascending,
+            "desc" => SortOrder.Descending,
+            null => null,
+            _ => throw new ArgumentException($"Invalid sort order: {sort}. Valid values are: asc, desc, or omit for relevance sorting"),
+        };
+    }
+
+    /// <summary>
+    /// Creates the appropriate formatter based on the output format.
+    /// </summary>
+    private static IOutputFormatter<T> CreateFormatter(OutputFormat format)
+    {
+        return format switch
+        {
+            OutputFormat.Json => new JsonOutputFormatter<T>(),
+            OutputFormat.Yaml => new YamlOutputFormatter<T>(),
+            OutputFormat.Xml => new XmlOutputFormatter<T>(),
+            _ => new TextOutputFormatter<T>(),
+        };
+    }
+
+    /// <summary>
+    /// Executes the search command.
+    /// </summary>
+    private void Execute(
+        ParseResult parseResult,
+        string query,
+        string channel,
+        int from,
+        int size,
+        string? sort,
+        OutputFormat format,
+        bool detailed)
+    {
+        try
+        {
+            NixChannel nixChannel = ParseChannel(channel);
+            SortOrder? sortOrder = ParseSortOrder(sort);
+
+            INixSearchClient client = NixSearchClientFactory.Create();
+            ISearchResponse<T> response = this.ExecuteSearch(parseResult, client, query, nixChannel, from, size, sortOrder);
+
+            IOutputFormatter<T> formatter = CreateFormatter(format);
+            string output = formatter.Format(response, detailed);
+            Console.WriteLine(output);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+            Environment.Exit(1);
+        }
+    }
+}
