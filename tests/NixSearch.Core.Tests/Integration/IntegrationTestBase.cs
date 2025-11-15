@@ -38,18 +38,12 @@ public abstract class IntegrationTestBase : IDisposable
 
         // Get the client instance
         this.Client = this.serviceProvider.GetRequiredService<INixSearchClient>();
-        this.Options = this.serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<NixSearchOptions>>().Value;
     }
 
     /// <summary>
     /// Gets the NixSearch client instance.
     /// </summary>
     protected INixSearchClient Client { get; }
-
-    /// <summary>
-    /// Gets the NixSearch configuration options.
-    /// </summary>
-    protected NixSearchOptions Options { get; }
 
     /// <summary>
     /// Disposes the service provider.

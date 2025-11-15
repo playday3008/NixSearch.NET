@@ -4,6 +4,7 @@
 
 using System;
 using System.CommandLine;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using FluentAssertions;
@@ -363,6 +364,7 @@ public class BaseSearchCommandTests
         }
 
         /// <inheritdoc/>
+        [ExcludeFromCodeCoverage]
         protected override ISearchResponse<NixPackage> ExecuteSearch(
             ParseResult parseResult,
             INixSearchClient client,

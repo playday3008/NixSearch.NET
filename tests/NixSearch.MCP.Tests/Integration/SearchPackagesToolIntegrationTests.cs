@@ -172,4 +172,82 @@ public class SearchPackagesToolIntegrationTests : IntegrationTestBase
         package.System.Should().NotBeNullOrEmpty();
         package.Platforms.Should().NotBeNull();
     }
+
+    /// <summary>
+    /// Tests that SearchPackages with license filter works.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Fact(Timeout = 30000)]
+    public async Task SearchPackages_WithLicenseFilter_ShouldReturnFilteredResults()
+    {
+        // Act
+        SearchResponse<NixPackage> result = await this.SearchPackagesTool.SearchPackages(
+            "bash",
+            license: ["gpl"],
+            size: 10,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+
+        // If results are returned, they should match the license filter
+        if (result.Results.Count > 0)
+        {
+            result.Results.Should().OnlyContain(p =>
+                p.License != null &&
+                p.License.Any(l => l.FullName != null && l.FullName.Contains("GPL", System.StringComparison.OrdinalIgnoreCase)));
+        }
+    }
+
+    /// <summary>
+    /// Tests that SearchPackages with maintainer filter works.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Fact(Timeout = 30000)]
+    public async Task SearchPackages_WithMaintainerFilter_ShouldReturnFilteredResults()
+    {
+        // Act
+        SearchResponse<NixPackage> result = await this.SearchPackagesTool.SearchPackages(
+            "vim",
+            maintainer: ["viric"],
+            size: 10,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+
+        // If results are returned, they should match the maintainer filter
+        if (result.Results.Count > 0)
+        {
+            result.Results.Should().OnlyContain(p =>
+                p.Maintainers != null &&
+                p.Maintainers.Any(m => m.Name == "viric" || (m.Email != null && m.Email.Contains("viric"))));
+        }
+    }
+
+    /// <summary>
+    /// Tests that SearchPackages with team filter works.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Fact(Timeout = 30000)]
+    public async Task SearchPackages_WithTeamFilter_ShouldReturnFilteredResults()
+    {
+        // Act
+        SearchResponse<NixPackage> result = await this.SearchPackagesTool.SearchPackages(
+            "systemd",
+            team: ["freedesktop"],
+            size: 10,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+
+        // If results are returned, verify the filter was applied (Teams property should be populated)
+        if (result.Results.Count > 0)
+        {
+            result.Results.Should().OnlyContain(p =>
+                p.Teams != null &&
+                p.Teams.Any(t => t.ShortName != null && t.ShortName.Contains("freedesktop", System.StringComparison.OrdinalIgnoreCase)));
+        }
+    }
 }

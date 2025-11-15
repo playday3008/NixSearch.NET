@@ -52,23 +52,11 @@ public abstract class IntegrationTestBase : IDisposable
         this.serviceProvider = services.BuildServiceProvider();
 
         // Get the client and tool instances
-        this.Client = this.serviceProvider.GetRequiredService<INixSearchClient>();
-        this.Options = this.serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<NixSearchOptions>>().Value;
         this.SearchPackagesTool = this.serviceProvider.GetRequiredService<SearchPackagesTool>();
         this.SearchOptionsTool = this.serviceProvider.GetRequiredService<SearchOptionsTool>();
         this.GetPackageDetailsTool = this.serviceProvider.GetRequiredService<GetPackageDetailsTool>();
         this.GetOptionDetailsTool = this.serviceProvider.GetRequiredService<GetOptionDetailsTool>();
     }
-
-    /// <summary>
-    /// Gets the NixSearch client instance.
-    /// </summary>
-    protected INixSearchClient Client { get; }
-
-    /// <summary>
-    /// Gets the NixSearch configuration options.
-    /// </summary>
-    protected NixSearchOptions Options { get; }
 
     /// <summary>
     /// Gets the SearchPackagesTool instance.
