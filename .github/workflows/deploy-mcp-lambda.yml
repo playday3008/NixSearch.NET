@@ -43,7 +43,7 @@ jobs:
         run: |
           dotnet publish src/NixSearch.MCP/NixSearch.MCP.csproj \
             --configuration Release \
-            --runtime linux-x64 \
+            --runtime linux-arm64 \
             --self-contained \
             --output publish \
             /p:PublishReadyToRun=false

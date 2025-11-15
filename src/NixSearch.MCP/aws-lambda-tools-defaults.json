@@ -18,7 +18,7 @@
   "function-description": "Model Context Protocol (MCP) server for NixOS package and option search",
   "package-type": "Zip",
   "function-role": "arn:aws:iam::552022094113:role/service-role/NixSearch-role-wn1y7otb",
-  "function-architecture": "x86_64",
+  "function-architecture": "arm64",
   "tracing-mode": "PassThrough",
   "environment-variables": "NIXSEARCH__Url=https://search.nixos.org/backend;NIXSEARCH__Username=aWVSALXpZv;NIXSEARCH__Password=X8gPHnzL52wFEekuxsfQ9cSh;NIXSEARCH__MappingSchemaVersion=44;NIXSEARCH__Timeout=00:01:30;NIXSEARCH__EnableDebugMode=false;MCP__Stateless=true",
   "function-url-enable": true,
