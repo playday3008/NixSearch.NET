@@ -19,6 +19,9 @@ jobs:
   deploy:
     name: Build and Deploy to Lambda
     runs-on: ubuntu-latest
+    environment:
+      name: MCP on AWS Lambda
+      url: https://zhyxgxr7amp6usu6o2qdeab6ja0bpybd.lambda-url.eu-central-1.on.aws/
 
     permissions:
       id-token: write
