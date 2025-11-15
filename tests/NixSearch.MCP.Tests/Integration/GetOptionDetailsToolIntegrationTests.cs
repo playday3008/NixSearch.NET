@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using FluentAssertions;
 
-using NixSearch.MCP.Models;
+using NixSearch.Core.Models;
 
 namespace NixSearch.MCP.Tests.Integration;
 
@@ -23,7 +23,7 @@ public class GetOptionDetailsToolIntegrationTests : IntegrationTestBase
     public async Task GetOptionDetails_WithExactOptionName_ShouldReturnOption()
     {
         // Act
-        OptionResult? result = await this.GetOptionDetailsTool.GetOptionDetails(
+        NixOption? result = await this.GetOptionDetailsTool.GetOptionDetails(
             "services.openssh.enable",
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -40,7 +40,7 @@ public class GetOptionDetailsToolIntegrationTests : IntegrationTestBase
     public async Task GetOptionDetails_WithNonexistentOption_ShouldReturnNull()
     {
         // Act
-        OptionResult? result = await this.GetOptionDetailsTool.GetOptionDetails(
+        NixOption? result = await this.GetOptionDetailsTool.GetOptionDetails(
             "this.option.definitely.does.not.exist.xyz123",
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -56,7 +56,7 @@ public class GetOptionDetailsToolIntegrationTests : IntegrationTestBase
     public async Task GetOptionDetails_WithStableChannel_ShouldReturnOption()
     {
         // Act
-        OptionResult? result = await this.GetOptionDetailsTool.GetOptionDetails(
+        NixOption? result = await this.GetOptionDetailsTool.GetOptionDetails(
             "networking.hostName",
             channel: "stable",
             cancellationToken: TestContext.Current.CancellationToken);
@@ -74,7 +74,7 @@ public class GetOptionDetailsToolIntegrationTests : IntegrationTestBase
     public async Task GetOptionDetails_ShouldReturnExpectedFields()
     {
         // Act
-        OptionResult? result = await this.GetOptionDetailsTool.GetOptionDetails(
+        NixOption? result = await this.GetOptionDetailsTool.GetOptionDetails(
             "boot.loader.grub.enable",
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -92,10 +92,10 @@ public class GetOptionDetailsToolIntegrationTests : IntegrationTestBase
     public async Task GetOptionDetails_ShouldBeCaseInsensitive()
     {
         // Act
-        OptionResult? resultLower = await this.GetOptionDetailsTool.GetOptionDetails(
+        NixOption? resultLower = await this.GetOptionDetailsTool.GetOptionDetails(
             "services.nginx.enable",
             cancellationToken: TestContext.Current.CancellationToken);
-        OptionResult? resultUpper = await this.GetOptionDetailsTool.GetOptionDetails(
+        NixOption? resultUpper = await this.GetOptionDetailsTool.GetOptionDetails(
             "SERVICES.NGINX.ENABLE",
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -115,7 +115,7 @@ public class GetOptionDetailsToolIntegrationTests : IntegrationTestBase
     public async Task GetOptionDetails_WithCommonServiceOption_ShouldReturnOption()
     {
         // Act
-        OptionResult? result = await this.GetOptionDetailsTool.GetOptionDetails(
+        NixOption? result = await this.GetOptionDetailsTool.GetOptionDetails(
             "services.postgresql.enable",
             cancellationToken: TestContext.Current.CancellationToken);
 

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 using System.ComponentModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +12,6 @@ using NixSearch.Core.Models;
 using NixSearch.Core.Search;
 using NixSearch.Core.Search.Builders;
 using NixSearch.MCP.Helpers;
-using NixSearch.MCP.Mappers;
 using NixSearch.MCP.Models;
 
 namespace NixSearch.MCP.Tools;
@@ -42,7 +40,7 @@ public partial class SearchOptionsTool(
     /// <returns>Search results with option details.</returns>
     [McpServerTool]
     [Description("Search for NixOS configuration options. Returns option details including name, type, default value, example, description, and source location.")]
-    public async Task<SearchResponse<OptionResult>> SearchOptions(
+    public async Task<SearchResponse<NixOption>> SearchOptions(
         string query,
         string? channel = "unstable",
         int? page = 0,
@@ -67,13 +65,13 @@ public partial class SearchOptionsTool(
         long total = searchResponse.Total;
         bool hasMore = (currentPage + 1) * currentSize < total;
 
-        return new SearchResponse<OptionResult>
+        return new SearchResponse<NixOption>
         {
             Total = total,
             Page = currentPage,
             Size = currentSize,
             HasMore = hasMore,
-            Results = searchResponse.Documents.Select(o => o.ToOptionResult()).ToList(),
+            Results = [.. searchResponse.Documents],
         };
     }
 

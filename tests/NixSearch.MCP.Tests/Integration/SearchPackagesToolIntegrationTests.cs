@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using FluentAssertions;
 
+using NixSearch.Core.Models;
 using NixSearch.MCP.Models;
 
 namespace NixSearch.MCP.Tests.Integration;
@@ -24,7 +25,7 @@ public class SearchPackagesToolIntegrationTests : IntegrationTestBase
     public async Task SearchPackages_WithCommonPackage_ShouldReturnResults()
     {
         // Act
-        SearchResponse<PackageResult> result = await this.SearchPackagesTool.SearchPackages(
+        SearchResponse<NixPackage> result = await this.SearchPackagesTool.SearchPackages(
             "firefox",
             size: 10,
             cancellationToken: TestContext.Current.CancellationToken);
@@ -45,12 +46,12 @@ public class SearchPackagesToolIntegrationTests : IntegrationTestBase
     public async Task SearchPackages_WithPagination_ShouldReturnCorrectPage()
     {
         // Act
-        SearchResponse<PackageResult> page0 = await this.SearchPackagesTool.SearchPackages(
+        SearchResponse<NixPackage> page0 = await this.SearchPackagesTool.SearchPackages(
             "python",
             page: 0,
             size: 5,
             cancellationToken: TestContext.Current.CancellationToken);
-        SearchResponse<PackageResult> page1 = await this.SearchPackagesTool.SearchPackages(
+        SearchResponse<NixPackage> page1 = await this.SearchPackagesTool.SearchPackages(
             "python",
             page: 1,
             size: 5,
@@ -77,7 +78,7 @@ public class SearchPackagesToolIntegrationTests : IntegrationTestBase
     public async Task SearchPackages_WithPlatformFilter_ShouldReturnFilteredResults()
     {
         // Act
-        SearchResponse<PackageResult> result = await this.SearchPackagesTool.SearchPackages(
+        SearchResponse<NixPackage> result = await this.SearchPackagesTool.SearchPackages(
             "git",
             platform: ["x86_64-linux"],
             size: 10,
@@ -97,7 +98,7 @@ public class SearchPackagesToolIntegrationTests : IntegrationTestBase
     public async Task SearchPackages_WithStableChannel_ShouldReturnResults()
     {
         // Act
-        SearchResponse<PackageResult> result = await this.SearchPackagesTool.SearchPackages(
+        SearchResponse<NixPackage> result = await this.SearchPackagesTool.SearchPackages(
             "bash",
             channel: "stable",
             size: 5,
@@ -116,7 +117,7 @@ public class SearchPackagesToolIntegrationTests : IntegrationTestBase
     public async Task SearchPackages_WithNonexistentPackage_ShouldReturnEmpty()
     {
         // Act
-        SearchResponse<PackageResult> result = await this.SearchPackagesTool.SearchPackages(
+        SearchResponse<NixPackage> result = await this.SearchPackagesTool.SearchPackages(
             "this-package-definitely-does-not-exist-xyz123",
             size: 10,
             cancellationToken: TestContext.Current.CancellationToken);
@@ -135,7 +136,7 @@ public class SearchPackagesToolIntegrationTests : IntegrationTestBase
     public async Task SearchPackages_WithPackageSetFilter_ShouldReturnFilteredResults()
     {
         // Act
-        SearchResponse<PackageResult> result = await this.SearchPackagesTool.SearchPackages(
+        SearchResponse<NixPackage> result = await this.SearchPackagesTool.SearchPackages(
             "zfs",
             packageSet: ["linuxKernel"],
             size: 10,
@@ -155,7 +156,7 @@ public class SearchPackagesToolIntegrationTests : IntegrationTestBase
     public async Task SearchPackages_ShouldReturnAllFields()
     {
         // Act
-        SearchResponse<PackageResult> result = await this.SearchPackagesTool.SearchPackages(
+        SearchResponse<NixPackage> result = await this.SearchPackagesTool.SearchPackages(
             "nginx",
             size: 1,
             cancellationToken: TestContext.Current.CancellationToken);
@@ -164,7 +165,7 @@ public class SearchPackagesToolIntegrationTests : IntegrationTestBase
         result.Should().NotBeNull();
         result.Results.Should().NotBeEmpty();
 
-        PackageResult package = result.Results[0];
+        NixPackage package = result.Results[0];
         package.AttrName.Should().NotBeNullOrEmpty();
         package.Name.Should().NotBeNullOrEmpty();
         package.Version.Should().NotBeNullOrEmpty();

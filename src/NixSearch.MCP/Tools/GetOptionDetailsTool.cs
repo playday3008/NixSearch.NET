@@ -14,8 +14,6 @@ using NixSearch.Core.Models;
 using NixSearch.Core.Search;
 using NixSearch.Core.Search.Builders;
 using NixSearch.MCP.Helpers;
-using NixSearch.MCP.Mappers;
-using NixSearch.MCP.Models;
 
 namespace NixSearch.MCP.Tools;
 
@@ -38,7 +36,7 @@ public partial class GetOptionDetailsTool(
     /// <returns>Option details, or null if not found.</returns>
     [McpServerTool]
     [Description("Get comprehensive details about a specific NixOS configuration option.")]
-    public async Task<OptionResult?> GetOptionDetails(
+    public async Task<NixOption?> GetOptionDetails(
         string optionName,
         string? channel = "unstable",
         CancellationToken cancellationToken = default)
@@ -66,7 +64,7 @@ public partial class GetOptionDetailsTool(
 
         this.LogOptionFound(optionName);
 
-        return option.ToOptionResult();
+        return option;
     }
 
     [LoggerMessage(

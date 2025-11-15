@@ -14,8 +14,6 @@ using NixSearch.Core.Models;
 using NixSearch.Core.Search;
 using NixSearch.Core.Search.Builders;
 using NixSearch.MCP.Helpers;
-using NixSearch.MCP.Mappers;
-using NixSearch.MCP.Models;
 
 namespace NixSearch.MCP.Tools;
 
@@ -41,7 +39,7 @@ public partial class GetPackageDetailsTool(
     /// <returns>Package details, or null if not found.</returns>
     [McpServerTool]
     [Description("Get comprehensive details about a specific NixOS package by its attribute name.")]
-    public async Task<PackageResult?> GetPackageDetails(
+    public async Task<NixPackage?> GetPackageDetails(
         string attrName,
         string? channel = "unstable",
         CancellationToken cancellationToken = default)
@@ -69,7 +67,7 @@ public partial class GetPackageDetailsTool(
 
         this.LogPackageFound(package.AttrName, package.Version);
 
-        return package.ToPackageResult();
+        return package;
     }
 
     [LoggerMessage(

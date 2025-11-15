@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 using System.ComponentModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +12,6 @@ using NixSearch.Core.Models;
 using NixSearch.Core.Search;
 using NixSearch.Core.Search.Builders;
 using NixSearch.MCP.Helpers;
-using NixSearch.MCP.Mappers;
 using NixSearch.MCP.Models;
 
 namespace NixSearch.MCP.Tools;
@@ -47,7 +45,7 @@ public partial class SearchPackagesTool(
     /// <returns>Search results with package details.</returns>
     [McpServerTool]
     [Description("Search for NixOS packages in nixpkgs. Returns package details including name, version, description, maintainers, licenses, platforms, and more.")]
-    public async Task<SearchResponse<PackageResult>> SearchPackages(
+    public async Task<SearchResponse<NixPackage>> SearchPackages(
         string query,
         string? channel = "unstable",
         string[]? platform = null,
@@ -107,13 +105,13 @@ public partial class SearchPackagesTool(
         long total = searchResponse.Total;
         bool hasMore = (currentPage + 1) * currentSize < total;
 
-        return new SearchResponse<PackageResult>
+        return new SearchResponse<NixPackage>
         {
             Total = total,
             Page = currentPage,
             Size = currentSize,
             HasMore = hasMore,
-            Results = searchResponse.Documents.Select(p => p.ToPackageResult()).ToList(),
+            Results = [.. searchResponse.Documents],
         };
     }
 

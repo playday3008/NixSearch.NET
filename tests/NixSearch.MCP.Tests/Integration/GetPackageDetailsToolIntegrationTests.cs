@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using FluentAssertions;
 
-using NixSearch.MCP.Models;
+using NixSearch.Core.Models;
 
 namespace NixSearch.MCP.Tests.Integration;
 
@@ -23,7 +23,7 @@ public class GetPackageDetailsToolIntegrationTests : IntegrationTestBase
     public async Task GetPackageDetails_WithExactPackageName_ShouldReturnPackage()
     {
         // Act
-        PackageResult? result = await this.GetPackageDetailsTool.GetPackageDetails(
+        NixPackage? result = await this.GetPackageDetailsTool.GetPackageDetails(
             "firefox",
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -42,7 +42,7 @@ public class GetPackageDetailsToolIntegrationTests : IntegrationTestBase
     public async Task GetPackageDetails_WithNonexistentPackage_ShouldReturnNull()
     {
         // Act
-        PackageResult? result = await this.GetPackageDetailsTool.GetPackageDetails(
+        NixPackage? result = await this.GetPackageDetailsTool.GetPackageDetails(
             "this-package-definitely-does-not-exist-xyz123",
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -58,7 +58,7 @@ public class GetPackageDetailsToolIntegrationTests : IntegrationTestBase
     public async Task GetPackageDetails_WithStableChannel_ShouldReturnPackage()
     {
         // Act
-        PackageResult? result = await this.GetPackageDetailsTool.GetPackageDetails(
+        NixPackage? result = await this.GetPackageDetailsTool.GetPackageDetails(
             "zsh",
             channel: "stable",
             cancellationToken: TestContext.Current.CancellationToken);
@@ -76,7 +76,7 @@ public class GetPackageDetailsToolIntegrationTests : IntegrationTestBase
     public async Task GetPackageDetails_ShouldReturnAllFields()
     {
         // Act
-        PackageResult? result = await this.GetPackageDetailsTool.GetPackageDetails(
+        NixPackage? result = await this.GetPackageDetailsTool.GetPackageDetails(
             "git",
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -88,7 +88,7 @@ public class GetPackageDetailsToolIntegrationTests : IntegrationTestBase
         result.Version.Should().NotBeNullOrEmpty();
         result.System.Should().NotBeNullOrEmpty();
         result.Platforms.Should().NotBeNull();
-        result.LicenseNames.Should().NotBeNull();
+        result.License.Should().NotBeNull();
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public class GetPackageDetailsToolIntegrationTests : IntegrationTestBase
     public async Task GetPackageDetails_WithPackageInPackageSet_ShouldReturnPackage()
     {
         // Act
-        PackageResult? result = await this.GetPackageDetailsTool.GetPackageDetails(
+        NixPackage? result = await this.GetPackageDetailsTool.GetPackageDetails(
             "kodiPackages.requests",
             cancellationToken: TestContext.Current.CancellationToken);
 

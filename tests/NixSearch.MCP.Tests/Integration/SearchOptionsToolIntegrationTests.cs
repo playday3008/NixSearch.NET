@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using FluentAssertions;
 
+using NixSearch.Core.Models;
 using NixSearch.MCP.Models;
 
 namespace NixSearch.MCP.Tests.Integration;
@@ -23,7 +24,7 @@ public class SearchOptionsToolIntegrationTests : IntegrationTestBase
     public async Task SearchOptions_WithCommonOption_ShouldReturnResults()
     {
         // Act
-        SearchResponse<OptionResult> result = await this.SearchOptionsTool.SearchOptions(
+        SearchResponse<NixOption> result = await this.SearchOptionsTool.SearchOptions(
             "networking",
             size: 10,
             cancellationToken: TestContext.Current.CancellationToken);
@@ -44,12 +45,12 @@ public class SearchOptionsToolIntegrationTests : IntegrationTestBase
     public async Task SearchOptions_WithPagination_ShouldReturnCorrectPage()
     {
         // Act
-        SearchResponse<OptionResult> page0 = await this.SearchOptionsTool.SearchOptions(
+        SearchResponse<NixOption> page0 = await this.SearchOptionsTool.SearchOptions(
             "services",
             page: 0,
             size: 5,
             cancellationToken: TestContext.Current.CancellationToken);
-        SearchResponse<OptionResult> page1 = await this.SearchOptionsTool.SearchOptions(
+        SearchResponse<NixOption> page1 = await this.SearchOptionsTool.SearchOptions(
             "services",
             page: 1,
             size: 5,
@@ -76,7 +77,7 @@ public class SearchOptionsToolIntegrationTests : IntegrationTestBase
     public async Task SearchOptions_WithStableChannel_ShouldReturnResults()
     {
         // Act
-        SearchResponse<OptionResult> result = await this.SearchOptionsTool.SearchOptions(
+        SearchResponse<NixOption> result = await this.SearchOptionsTool.SearchOptions(
             "boot",
             channel: "stable",
             size: 5,
@@ -95,7 +96,7 @@ public class SearchOptionsToolIntegrationTests : IntegrationTestBase
     public async Task SearchOptions_WithNonexistentOption_ShouldReturnEmpty()
     {
         // Act
-        SearchResponse<OptionResult> result = await this.SearchOptionsTool.SearchOptions(
+        SearchResponse<NixOption> result = await this.SearchOptionsTool.SearchOptions(
             "this-option-definitely-does-not-exist-xyz123",
             size: 10,
             cancellationToken: TestContext.Current.CancellationToken);
@@ -114,7 +115,7 @@ public class SearchOptionsToolIntegrationTests : IntegrationTestBase
     public async Task SearchOptions_ShouldReturnAllFields()
     {
         // Act
-        SearchResponse<OptionResult> result = await this.SearchOptionsTool.SearchOptions(
+        SearchResponse<NixOption> result = await this.SearchOptionsTool.SearchOptions(
             "services.nginx.enable",
             size: 1,
             cancellationToken: TestContext.Current.CancellationToken);
@@ -123,7 +124,7 @@ public class SearchOptionsToolIntegrationTests : IntegrationTestBase
         result.Should().NotBeNull();
         result.Results.Should().NotBeEmpty();
 
-        OptionResult option = result.Results[0];
+        NixOption option = result.Results[0];
         option.Name.Should().NotBeNullOrEmpty();
     }
 
@@ -135,7 +136,7 @@ public class SearchOptionsToolIntegrationTests : IntegrationTestBase
     public async Task SearchOptions_ShouldCalculateHasMoreCorrectly()
     {
         // Act - Get a small page from a query that has many results
-        SearchResponse<OptionResult> result = await this.SearchOptionsTool.SearchOptions(
+        SearchResponse<NixOption> result = await this.SearchOptionsTool.SearchOptions(
             "enable",
             size: 5,
             cancellationToken: TestContext.Current.CancellationToken);
