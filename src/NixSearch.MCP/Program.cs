@@ -90,8 +90,9 @@ app.MapGet("/info", () => Results.Ok(new
     description = "Model Context Protocol server for NixOS package and option search",
     endpoints = new
     {
-        mcp = "/mcp",
+        mcp = "/",
         health = "/health",
+        info = "/info",
     },
     tools = tools,
 }));
