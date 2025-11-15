@@ -13,6 +13,9 @@ using NixSearch.MCP.Tools;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+// Add AWS Lambda support
+builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
+
 // Configure logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();

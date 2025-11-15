@@ -1,0 +1,107 @@
+name: Deploy MCP to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/NixSearch.MCP/**'
+      - 'src/NixSearch.Core/**'
+      - '.github/workflows/deploy-mcp-lambda.yml'
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  AWS_REGION: eu-central-1
+  FUNCTION_NAME: NixSearchMCP
+
+jobs:
+  deploy:
+    name: Build and Deploy to Lambda
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore src/NixSearch.MCP/NixSearch.MCP.csproj
+
+      - name: Build and Publish
+        run: |
+          dotnet publish src/NixSearch.MCP/NixSearch.MCP.csproj \
+            --configuration Release \
+            --runtime linux-x64 \
+            --self-contained \
+            --output publish \
+            /p:PublishReadyToRun=false
+
+      - name: Prepare Lambda package
+        run: |
+          cd publish
+          mv NixSearch.MCP bootstrap
+          chmod +x bootstrap
+          zip -r ../nixsearch-mcp-lambda.zip .
+          cd ..
+          ls -lh nixsearch-mcp-lambda.zip
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ env.FUNCTION_NAME }} \
+            --zip-file fileb://nixsearch-mcp-lambda.zip
+
+      - name: Wait for function update
+        run: |
+          aws lambda wait function-updated \
+            --function-name ${{ env.FUNCTION_NAME }}
+
+      - name: Update environment variables
+        run: |
+          aws lambda update-function-configuration \
+            --function-name ${{ env.FUNCTION_NAME }} \
+            --environment "Variables={
+              NIXSEARCH__Url=${{ secrets.NIXSEARCH_URL }},
+              NIXSEARCH__Username=${{ secrets.NIXSEARCH_USERNAME }},
+              NIXSEARCH__Password=${{ secrets.NIXSEARCH_PASSWORD }},
+              NIXSEARCH__MappingSchemaVersion=${{ secrets.NIXSEARCH_MAPPING_VERSION }},
+              NIXSEARCH__Timeout=00:01:30,
+              NIXSEARCH__EnableDebugMode=false,
+              MCP__Stateless=true,
+              DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+            }"
+
+      - name: Wait for configuration update
+        run: |
+          aws lambda wait function-updated \
+            --function-name ${{ env.FUNCTION_NAME }}
+
+      - name: Verify deployment
+        run: |
+          FUNCTION_URL=$(aws lambda get-function-url-config \
+            --function-name ${{ env.FUNCTION_NAME }} \
+            --query 'FunctionUrl' \
+            --output text)
+
+          echo "Testing health endpoint..."
+          curl -s "${FUNCTION_URL}health" | jq .
+
+          echo "Testing info endpoint..."
+          curl -s "${FUNCTION_URL}info" | jq .
+
+          echo "Deployment successful! Function URL: ${FUNCTION_URL}"
