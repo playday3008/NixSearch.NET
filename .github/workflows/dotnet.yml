@@ -29,7 +29,7 @@ jobs:
       run: dotnet build --no-restore --configuration Release
 
     - name: Test
-      run: dotnet test --no-build --verbosity detailed --configuration Release
+      run: dotnet test --no-build --verbosity detailed --configuration Release --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -46,5 +46,5 @@ jobs:
       if: always()
       with:
         name: test-results
-        path: '**/TestResults/**'
+        path: ./TestResults/**/*.trx
         retention-days: 7
