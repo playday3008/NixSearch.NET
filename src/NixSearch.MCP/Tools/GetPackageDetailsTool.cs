@@ -40,7 +40,9 @@ public partial class GetPackageDetailsTool(
     [McpServerTool]
     [Description("Get comprehensive details about a specific NixOS package by its attribute name.")]
     public async Task<NixPackage?> GetPackageDetails(
+        [Description("Package attribute name (e.g., 'firefox', 'python3Packages.numpy')")]
         string attrName,
+        [Description("NixOS channel (unstable, stable, flakes)")]
         string? channel = "unstable",
         CancellationToken cancellationToken = default)
     {

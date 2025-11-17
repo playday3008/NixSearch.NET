@@ -37,7 +37,9 @@ public partial class GetOptionDetailsTool(
     [McpServerTool]
     [Description("Get comprehensive details about a specific NixOS configuration option.")]
     public async Task<NixOption?> GetOptionDetails(
+        [Description("Full option name (e.g., 'services.nginx.enable')")]
         string optionName,
+        [Description("NixOS channel (unstable, stable, flakes)")]
         string? channel = "unstable",
         CancellationToken cancellationToken = default)
     {

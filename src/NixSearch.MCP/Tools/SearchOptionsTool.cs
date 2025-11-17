@@ -41,9 +41,13 @@ public partial class SearchOptionsTool(
     [McpServerTool]
     [Description("Search for NixOS configuration options. Returns option details including name, type, default value, example, description, and source location.")]
     public async Task<SearchResponse<NixOption>> SearchOptions(
+        [Description("Search query (option name, description keywords, etc.)")]
         string query,
+        [Description("NixOS channel to search in (unstable, stable, flakes)")]
         string? channel = "unstable",
+        [Description("Page number (0-indexed)")]
         int? page = 0,
+        [Description("Number of results per page")]
         int? size = 50,
         CancellationToken cancellationToken = default)
     {
