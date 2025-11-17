@@ -35,6 +35,16 @@ public record NixSearchOptions
     public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(30);
 
     /// <summary>
+    /// Gets or sets the maximum number of retries for failed requests.
+    /// </summary>
+    public int MaxRetries { get; set; } = 5;
+
+    /// <summary>
+    /// Gets or sets the maximum total time to spend on retries.
+    /// </summary>
+    public TimeSpan MaxRetryTimeout { get; set; } = TimeSpan.FromMinutes(2);
+
+    /// <summary>
     /// Gets or sets a value indicating whether to enable debugging.
     /// </summary>
     public bool EnableDebugMode { get; set; }

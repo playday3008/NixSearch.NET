@@ -84,7 +84,9 @@ public static class ServiceCollectionExtensions
 
         ConnectionSettings settings = new ConnectionSettings(new Uri(options.Url))
             .RequestTimeout(options.Timeout)
-            .BasicAuthentication(options.Username, options.Password);
+            .BasicAuthentication(options.Username, options.Password)
+            .MaximumRetries(options.MaxRetries)
+            .MaxRetryTimeout(options.MaxRetryTimeout);
 
         if (options.EnableDebugMode)
         {
