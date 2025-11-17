@@ -9,9 +9,12 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  DOTNET_VERSION: '9.0.x'
+
 jobs:
   build:
-
+    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
@@ -20,7 +23,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
       run: dotnet restore
@@ -32,7 +35,7 @@ jobs:
       run: dotnet test --no-build --verbosity detailed --configuration Release --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: success()
       with:
         name: build-artifacts
@@ -42,7 +45,7 @@ jobs:
         retention-days: 7
 
     - name: Upload test results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: always()
       with:
         name: test-results
