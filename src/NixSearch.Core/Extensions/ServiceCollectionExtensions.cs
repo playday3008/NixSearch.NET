@@ -86,7 +86,8 @@ public static class ServiceCollectionExtensions
             .RequestTimeout(options.Timeout)
             .BasicAuthentication(options.Username, options.Password)
             .MaximumRetries(options.MaxRetries)
-            .MaxRetryTimeout(options.MaxRetryTimeout);
+            .MaxRetryTimeout(options.MaxRetryTimeout)
+            .EnableHttpCompression();
 
         if (options.EnableDebugMode)
         {

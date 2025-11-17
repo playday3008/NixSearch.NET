@@ -162,7 +162,7 @@ public abstract class SearchBuilderBase<TSource, TBuilder>
 
         this.InspectSearchDescriptor(searchDescriptor);
 
-        ISearchResponse<TSource> searchResponse = await this.Client.SearchAsync<TSource>(searchDescriptor, cancellationToken);
+        ISearchResponse<TSource> searchResponse = await this.ExecuteWithRetryAsync(searchDescriptor, cancellationToken);
 
         this.InspectSearchResponse(searchResponse);
 
@@ -208,6 +208,58 @@ public abstract class SearchBuilderBase<TSource, TBuilder>
 
             throw new NixSearchException(errorMessage, searchResponse.OriginalException);
         }
+    }
+
+    /// <summary>
+    /// Determines if an exception is transient and should be retried.
+    /// </summary>
+    /// <param name="ex">The exception to check.</param>
+    /// <returns>True if the exception is transient; otherwise, false.</returns>
+    private static bool IsTransientException(Exception ex)
+    {
+        return ex is System.Net.Http.HttpRequestException
+            || ex is System.Net.Sockets.SocketException
+            || ex is System.IO.IOException
+            || ex is System.Threading.Tasks.TaskCanceledException;
+    }
+
+    /// <summary>
+    /// Executes a search request with retry logic for transient failures.
+    /// </summary>
+    /// <param name="searchDescriptor">The search descriptor.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The search response.</returns>
+    private async Task<ISearchResponse<TSource>> ExecuteWithRetryAsync(
+        SearchDescriptor<TSource> searchDescriptor,
+        CancellationToken cancellationToken)
+    {
+        int maxRetries = this.Configuration.MaxRetries;
+        Exception? lastException = null;
+
+        for (int attempt = 0; attempt <= maxRetries; attempt++)
+        {
+            try
+            {
+                return await this.Client.SearchAsync<TSource>(searchDescriptor, cancellationToken);
+            }
+            catch (Exception ex) when (IsTransientException(ex))
+            {
+                lastException = ex;
+
+                // If this was the last attempt, don't delay, just throw
+                if (attempt >= maxRetries)
+                {
+                    break;
+                }
+
+                // Exponential backoff: 1s, 2s, 4s, 8s, 16s, max 30s
+                int delayMs = (int)Math.Min(1000 * Math.Pow(2, attempt), 30000);
+                await Task.Delay(delayMs, cancellationToken);
+            }
+        }
+
+        // If we got here, all retries failed with a transient exception
+        throw lastException!;
     }
 
     [Conditional("DEBUG")]
