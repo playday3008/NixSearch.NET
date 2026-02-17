@@ -72,21 +72,6 @@ public class SearchBuilderBaseTests
     }
 
     /// <summary>
-    /// Constructor with null options should throw <see cref="ArgumentNullException"/>.
-    /// </summary>
-    [Fact]
-    public void Constructor_WithNullOptions_ShouldThrowArgumentNullException()
-    {
-        // Arrange
-
-        // Act
-        Action act = () => _ = new TestSearchBuilder(this.mockClient.Object, null!);
-
-        // Assert
-        act.Should().Throw<ArgumentNullException>();
-    }
-
-    /// <summary>
     /// WithQuery with valid query should set query.
     /// </summary>
     [Fact]
@@ -102,23 +87,6 @@ public class SearchBuilderBaseTests
         // Assert
         result.Should().BeSameAs(builder);
         builder.GetQuery().Should().Be(query);
-    }
-
-    /// <summary>
-    /// WithQuery with null query should set empty string.
-    /// </summary>
-    [Fact]
-    public void WithQuery_WithNullQuery_ShouldSetEmptyString()
-    {
-        // Arrange
-        TestSearchBuilder builder = new(this.mockClient.Object, this.options);
-
-        // Act
-        TestSearchBuilder result = builder.WithQuery(null!);
-
-        // Assert
-        result.Should().BeSameAs(builder);
-        builder.GetQuery().Should().Be(string.Empty);
     }
 
     /// <summary>

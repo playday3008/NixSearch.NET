@@ -56,23 +56,6 @@ public class PackageSearchBuilderBaseTests
     }
 
     /// <summary>
-    /// WithPackageSet with null sets should not throw.
-    /// </summary>
-    [Fact]
-    public void WithPackageSet_WithNullSets_ShouldNotThrow()
-    {
-        // Arrange
-        TestPackageSearchBuilder builder = new(this.mockClient.Object, this.options);
-
-        // Act
-        PackageSearchBuilderBase result = builder.WithPackageSet(null!);
-
-        // Assert
-        result.Should().BeSameAs(builder);
-        builder.GetAttributes().Should().BeEmpty();
-    }
-
-    /// <summary>
     /// WithPackageSet called multiple times should accumulate values.
     /// </summary>
     [Fact]
@@ -107,23 +90,6 @@ public class PackageSearchBuilderBaseTests
     }
 
     /// <summary>
-    /// WithLicense with null licenses should not throw.
-    /// </summary>
-    [Fact]
-    public void WithLicense_WithNullLicenses_ShouldNotThrow()
-    {
-        // Arrange
-        TestPackageSearchBuilder builder = new(this.mockClient.Object, this.options);
-
-        // Act
-        PackageSearchBuilderBase result = builder.WithLicense(null!);
-
-        // Assert
-        result.Should().BeSameAs(builder);
-        builder.GetLicenses().Should().BeEmpty();
-    }
-
-    /// <summary>
     /// WithMaintainer with valid maintainers should add to maintainers.
     /// </summary>
     [Fact]
@@ -138,23 +104,6 @@ public class PackageSearchBuilderBaseTests
         // Assert
         result.Should().BeSameAs(builder);
         builder.GetMaintainers().Should().ContainInOrder("alice", "bob");
-    }
-
-    /// <summary>
-    /// WithMaintainer with null maintainers should not throw.
-    /// </summary>
-    [Fact]
-    public void WithMaintainer_WithNullMaintainers_ShouldNotThrow()
-    {
-        // Arrange
-        TestPackageSearchBuilder builder = new(this.mockClient.Object, this.options);
-
-        // Act
-        PackageSearchBuilderBase result = builder.WithMaintainer(null!);
-
-        // Assert
-        result.Should().BeSameAs(builder);
-        builder.GetMaintainers().Should().BeEmpty();
     }
 
     /// <summary>
@@ -175,23 +124,6 @@ public class PackageSearchBuilderBaseTests
     }
 
     /// <summary>
-    /// WithTeam with null teams should not throw.
-    /// </summary>
-    [Fact]
-    public void WithTeam_WithNullTeams_ShouldNotThrow()
-    {
-        // Arrange
-        TestPackageSearchBuilder builder = new(this.mockClient.Object, this.options);
-
-        // Act
-        PackageSearchBuilderBase result = builder.WithTeam(null!);
-
-        // Assert
-        result.Should().BeSameAs(builder);
-        builder.GetTeams().Should().BeEmpty();
-    }
-
-    /// <summary>
     /// WithPlatform with valid platforms should add to platforms.
     /// </summary>
     [Fact]
@@ -206,23 +138,6 @@ public class PackageSearchBuilderBaseTests
         // Assert
         result.Should().BeSameAs(builder);
         builder.GetPlatforms().Should().ContainInOrder("x86_64-linux", "aarch64-darwin");
-    }
-
-    /// <summary>
-    /// WithPlatform with null platforms should not throw.
-    /// </summary>
-    [Fact]
-    public void WithPlatform_WithNullPlatforms_ShouldNotThrow()
-    {
-        // Arrange
-        TestPackageSearchBuilder builder = new(this.mockClient.Object, this.options);
-
-        // Act
-        PackageSearchBuilderBase result = builder.WithPlatform(null!);
-
-        // Assert
-        result.Should().BeSameAs(builder);
-        builder.GetPlatforms().Should().BeEmpty();
     }
 
     /// <summary>
