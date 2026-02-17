@@ -57,7 +57,7 @@ public class ServiceCollectionExtensionsTests
         nixSearchClient.Should().NotBeNull();
         elasticClient.Should().NotBeNull();
         options.Should().NotBeNull();
-        options!.Value.Url.Should().Be(configData["Url"]);
+        options.Value.Url.Should().Be(configData["Url"]);
         options.Value.Username.Should().Be(configData["Username"]);
         options.Value.Password.Should().Be(configData["Password"]);
         options.Value.MappingSchemaVersion.Should().Be(44);
@@ -137,7 +137,7 @@ public class ServiceCollectionExtensionsTests
         nixSearchClient.Should().NotBeNull();
         elasticClient.Should().NotBeNull();
         options.Should().NotBeNull();
-        options!.Value.Url.Should().Be(opts.Url);
+        options.Value.Url.Should().Be(opts.Url);
         options.Value.Username.Should().Be(opts.Username);
         options.Value.Password.Should().Be(opts.Password);
         options.Value.MappingSchemaVersion.Should().Be(opts.MappingSchemaVersion);

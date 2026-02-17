@@ -95,31 +95,31 @@ public class PackagesCommand : BaseSearchCommand<NixPackage>
             .Page(from, size)
             .SortBy(sortOrder);
 
-        var platforms = parseResult.GetValue(this.platformOption);
+        string[]? platforms = parseResult.GetValue(this.platformOption);
         if (platforms?.Length > 0)
         {
             builder.WithPlatform(platforms);
         }
 
-        var packageSets = parseResult.GetValue(this.packageSetOption);
+        string[]? packageSets = parseResult.GetValue(this.packageSetOption);
         if (packageSets?.Length > 0)
         {
             builder.WithPackageSet(packageSets);
         }
 
-        var licenses = parseResult.GetValue(this.licenseOption);
+        string[]? licenses = parseResult.GetValue(this.licenseOption);
         if (licenses?.Length > 0)
         {
             builder.WithLicense(licenses);
         }
 
-        var maintainers = parseResult.GetValue(this.maintainerOption);
+        string[]? maintainers = parseResult.GetValue(this.maintainerOption);
         if (maintainers?.Length > 0)
         {
             builder.WithMaintainer(maintainers);
         }
 
-        var teams = parseResult.GetValue(this.teamOption);
+        string[]? teams = parseResult.GetValue(this.teamOption);
         if (teams?.Length > 0)
         {
             builder.WithTeam(teams);

@@ -92,7 +92,7 @@ public static class ServiceCollectionExtensions
         if (options.EnableDebugMode)
         {
             settings.EnableDebugMode();
-            settings.DisableDirectStreaming(true);
+            settings.DisableDirectStreaming();
         }
 
         return new ElasticClient(settings);

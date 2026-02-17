@@ -61,7 +61,7 @@ public static class TestDataFactory
             Outputs = ["out", "doc"],
             Programs = ["vim", "vi"],
             MainProgram = "vim",
-            License = [new NixSearch.Core.Models.Package.License { FullName = "Vim" }],
+            License = [new License { FullName = "Vim" }],
             LicenseSet = ["vim"],
             Maintainers = [new Maintainer { Name = "John Doe", Email = "john@example.com" }],
             MaintainersSet = ["johndoe"],

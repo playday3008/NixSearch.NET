@@ -100,19 +100,19 @@ public class BaseSearchCommandTests
         Command result = command.CreateTestCommand("test", "Test command");
 
         // Assert
-        var channelOption = result.Options.First(o => o.Name == "--channel");
+        Option channelOption = result.Options.First(o => o.Name == "--channel");
         channelOption.Should().BeOfType<Option<string>>();
 
-        var fromOption = result.Options.First(o => o.Name == "--from");
+        Option fromOption = result.Options.First(o => o.Name == "--from");
         fromOption.Should().BeOfType<Option<int>>();
 
-        var sizeOption = result.Options.First(o => o.Name == "--size");
+        Option sizeOption = result.Options.First(o => o.Name == "--size");
         sizeOption.Should().BeOfType<Option<int>>();
 
-        var formatOption = result.Options.First(o => o.Name == "--format");
+        Option formatOption = result.Options.First(o => o.Name == "--format");
         formatOption.Should().NotBeNull();
 
-        var detailedOption = result.Options.First(o => o.Name == "--detailed");
+        Option detailedOption = result.Options.First(o => o.Name == "--detailed");
         detailedOption.Should().BeOfType<Option<bool>>();
     }
 

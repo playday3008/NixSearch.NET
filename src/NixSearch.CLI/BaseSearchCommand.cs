@@ -129,15 +129,15 @@ public abstract class BaseSearchCommand<T>
 
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var query = parseResult.GetValue(queryArgument);
-            var channel = parseResult.GetValue(channelOption);
-            var from = parseResult.GetValue(fromOption);
-            var size = parseResult.GetValue(sizeOption);
-            var sort = parseResult.GetValue(sortOption);
-            var format = parseResult.GetValue(formatOption);
-            var detailed = parseResult.GetValue(detailedOption);
+            string query = parseResult.GetRequiredValue(queryArgument);
+            string channel = parseResult.GetRequiredValue(channelOption);
+            int from = parseResult.GetValue(fromOption);
+            int size = parseResult.GetValue(sizeOption);
+            string? sort = parseResult.GetValue(sortOption);
+            OutputFormat format = parseResult.GetValue(formatOption);
+            bool detailed = parseResult.GetValue(detailedOption);
 
-            await this.ExecuteAsync(parseResult, query!, channel!, from, size, sort, format, detailed, cancellationToken);
+            await this.ExecuteAsync(parseResult, query, channel, from, size, sort, format, detailed, cancellationToken);
         });
 
         return command;
@@ -203,7 +203,7 @@ public abstract class BaseSearchCommand<T>
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            await Console.Error.WriteLineAsync($"Error: {ex.Message}");
             Environment.Exit(1);
         }
     }

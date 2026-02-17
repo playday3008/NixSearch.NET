@@ -96,11 +96,11 @@ public class XmlOutputFormatterTests
         // Assert
         XmlNode? totalNode = doc.SelectSingleNode("/SearchResponse/Total");
         totalNode.Should().NotBeNull();
-        totalNode!.InnerText.Should().Be("2");
+        totalNode.InnerText.Should().Be("2");
 
         XmlNodeList? resultNodes = doc.SelectNodes("/SearchResponse/Results/Item");
         resultNodes.Should().NotBeNull();
-        resultNodes!.Count.Should().Be(2);
+        resultNodes.Count.Should().Be(2);
     }
 
     /// <summary>

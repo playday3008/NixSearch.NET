@@ -71,7 +71,7 @@ public sealed class NixSearchClient : INixSearchClient
         List<NixChannel> channels = catResponse.Records
             .Select(r => r.Alias)
             .Where(a => a.StartsWith(aliasPrefix, StringComparison.Ordinal))
-            .Select(a => NixChannel.FromValue(a.Substring(aliasPrefix.Length)))
+            .Select(a => NixChannel.FromValue(a[aliasPrefix.Length..]))
             .Distinct()
             .ToList();
 

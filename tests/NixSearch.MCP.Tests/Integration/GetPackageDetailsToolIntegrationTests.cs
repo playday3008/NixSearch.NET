@@ -29,7 +29,7 @@ public class GetPackageDetailsToolIntegrationTests : IntegrationTestBase
 
         // Assert
         result.Should().NotBeNull();
-        result!.AttrName.Should().Be("firefox");
+        result.AttrName.Should().Be("firefox");
         result.Name.Should().Be("firefox");
         result.Version.Should().NotBeNullOrEmpty();
     }
@@ -65,7 +65,7 @@ public class GetPackageDetailsToolIntegrationTests : IntegrationTestBase
 
         // Assert
         result.Should().NotBeNull();
-        result!.Name.Should().Be("zsh");
+        result.Name.Should().Be("zsh");
     }
 
     /// <summary>
@@ -82,7 +82,7 @@ public class GetPackageDetailsToolIntegrationTests : IntegrationTestBase
 
         // Assert
         result.Should().NotBeNull();
-        result!.AttrName.Should().NotBeNullOrEmpty();
+        result.AttrName.Should().NotBeNullOrEmpty();
         result.AttrSet.Should().NotBeNullOrEmpty();
         result.Name.Should().NotBeNullOrEmpty();
         result.Version.Should().NotBeNullOrEmpty();
@@ -105,7 +105,7 @@ public class GetPackageDetailsToolIntegrationTests : IntegrationTestBase
 
         // Assert
         result.Should().NotBeNull();
-        result!.AttrName.Should().Be("kodiPackages.requests");
+        result.AttrName.Should().Be("kodiPackages.requests");
         result.AttrSet.Should().Be("kodiPackages");
         result.Name.Should().Be("kodi-requests");
     }

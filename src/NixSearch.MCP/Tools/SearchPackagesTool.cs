@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -42,29 +41,21 @@ public partial class SearchPackagesTool(
     /// <param name="page">Page number (0-indexed).</param>
     /// <param name="size">Number of results per page.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>Search results with package details.</returns>
+    /// <returns>Search results with package details including name, version, description, maintainers, licenses, platforms, and more.</returns>
     [McpServerTool]
-    [Description("Search for NixOS packages in nixpkgs. Returns package details including name, version, description, maintainers, licenses, platforms, and more.")]
-    public async Task<SearchResponse<NixPackage>> SearchPackages(
-        [Description("Search query (package name, description keywords, etc.)")]
+    public async partial Task<SearchResponse<NixPackage>> SearchPackages(
         string query,
-        [Description("NixOS channel to search in (unstable, stable, beta, flakes)")]
+#pragma warning disable CS1066 // ModelContextProtocol WILL use those default values.
         string? channel = "unstable",
-        [Description("Filter by platforms (e.g., x86_64-linux, aarch64-darwin)")]
         string[]? platform = null,
-        [Description("Filter by package sets (e.g., python3Packages, haskellPackages)")]
         string[]? packageSet = null,
-        [Description("Filter by license names")]
         string[]? license = null,
-        [Description("Filter by maintainer usernames")]
         string[]? maintainer = null,
-        [Description("Filter by team names")]
         string[]? team = null,
-        [Description("Page number (0-indexed)")]
         int? page = 0,
-        [Description("Number of results per page")]
         int? size = 50,
         CancellationToken cancellationToken = default)
+#pragma warning restore CS1066
     {
         this.LogSearchingPackages(query, channel, page, size);
 

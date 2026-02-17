@@ -98,9 +98,9 @@ public sealed class OptionSearchBuilder(
                                     .Wildcard(wc => wc
                                         .Field(name)
                                         .Value($"*{this.Query}*")
-                                        .CaseInsensitive(true)))))))
+                                        .CaseInsensitive()))))))
             .From(this.From)
             .Size(this.Size)
-            .Sort(s => sortDescriptor);
+            .Sort(_ => sortDescriptor);
     }
 }

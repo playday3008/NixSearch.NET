@@ -110,7 +110,7 @@ public sealed class NixPackageIntegrationTests : IntegrationTestBase
             .FirstOrDefault(p => p.License.Length > 0 && p.License[0].FullName != null);
 
         packageWithLicense.Should().NotBeNull();
-        packageWithLicense!.License.Should().NotBeEmpty();
+        packageWithLicense.License.Should().NotBeEmpty();
         packageWithLicense.License[0].Should().NotBeNull();
     }
 
@@ -133,7 +133,7 @@ public sealed class NixPackageIntegrationTests : IntegrationTestBase
             .FirstOrDefault(p => p.Maintainers.Length > 0 && p.Maintainers[0].Name != null);
 
         packageWithMaintainer.Should().NotBeNull();
-        packageWithMaintainer!.Maintainers.Should().NotBeEmpty();
+        packageWithMaintainer.Maintainers.Should().NotBeEmpty();
         packageWithMaintainer.Maintainers[0].Should().NotBeNull();
     }
 
@@ -156,7 +156,7 @@ public sealed class NixPackageIntegrationTests : IntegrationTestBase
             .FirstOrDefault(p => p.Teams.Length > 0);
 
         packageWithTeam.Should().NotBeNull();
-        packageWithTeam!.Teams.Should().NotBeEmpty();
+        packageWithTeam.Teams.Should().NotBeEmpty();
         packageWithTeam.Teams[0].Should().NotBeNull();
     }
 
@@ -176,15 +176,15 @@ public sealed class NixPackageIntegrationTests : IntegrationTestBase
 
         // Assert - Find a package with Hydra build information
         NixPackage? packageWithHydra = response.Documents
-            .FirstOrDefault(p => p.Hydra != null && p.Hydra.Length > 0);
+            .FirstOrDefault(p => p.Hydra is { Length: > 0 });
 
         Assert.SkipWhen(packageWithHydra == null, "No package with Hydra information found in the search results.");
 
         packageWithHydra.Should().NotBeNull();
-        packageWithHydra!.Hydra.Should().NotBeNull();
+        packageWithHydra.Hydra.Should().NotBeNull();
         packageWithHydra.Hydra.Should().NotBeEmpty();
 
-        Hydra hydra = packageWithHydra.Hydra![0];
+        Hydra hydra = packageWithHydra.Hydra[0];
         hydra.BuildId.Should().BeGreaterThan(0);
         hydra.Platform.Should().NotBeNullOrEmpty();
         hydra.Project.Should().NotBeNullOrEmpty();
@@ -210,14 +210,14 @@ public sealed class NixPackageIntegrationTests : IntegrationTestBase
 
         // Assert - Find a package with Hydra path information
         NixPackage? packageWithHydra = response.Documents
-            .FirstOrDefault(p => p.Hydra != null && p.Hydra.Length > 0 && p.Hydra[0].Path.Length > 0);
+            .FirstOrDefault(p => p.Hydra is { Length: > 0 } && p.Hydra[0].Path.Length > 0);
 
         Assert.SkipWhen(packageWithHydra == null, "No package with Hydra information found in the search results.");
 
         packageWithHydra.Should().NotBeNull();
-        packageWithHydra!.Hydra.Should().NotBeNull();
+        packageWithHydra.Hydra.Should().NotBeNull();
 
-        HydraPath path = packageWithHydra.Hydra![0].Path[0];
+        HydraPath path = packageWithHydra.Hydra[0].Path[0];
         path.Should().NotBeNull();
         path.Output.Should().NotBeNullOrEmpty();
         path.Path.Should().NotBeNullOrEmpty();
@@ -312,7 +312,7 @@ public sealed class NixPackageIntegrationTests : IntegrationTestBase
             .FirstOrDefault(p => !string.IsNullOrEmpty(p.Description));
 
         packageWithDescription.Should().NotBeNull();
-        packageWithDescription!.Description.Should().NotBeNullOrEmpty();
+        packageWithDescription.Description.Should().NotBeNullOrEmpty();
     }
 
     /// <summary>
@@ -331,10 +331,10 @@ public sealed class NixPackageIntegrationTests : IntegrationTestBase
 
         // Assert - Find a package with homepage
         NixPackage? packageWithHomepage = response.Documents
-            .FirstOrDefault(p => p.Homepage != null && p.Homepage.Length > 0);
+            .FirstOrDefault(p => p.Homepage is { Length: > 0 });
 
         packageWithHomepage.Should().NotBeNull();
-        packageWithHomepage!.Homepage.Should().NotBeNull();
+        packageWithHomepage.Homepage.Should().NotBeNull();
         packageWithHomepage.Homepage.Should().NotBeEmpty();
     }
 
@@ -357,6 +357,6 @@ public sealed class NixPackageIntegrationTests : IntegrationTestBase
             .FirstOrDefault(p => !string.IsNullOrEmpty(p.Position));
 
         packageWithPosition.Should().NotBeNull();
-        packageWithPosition!.Position.Should().NotBeNullOrEmpty();
+        packageWithPosition.Position.Should().NotBeNullOrEmpty();
     }
 }

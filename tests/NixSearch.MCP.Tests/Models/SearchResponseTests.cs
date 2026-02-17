@@ -22,13 +22,13 @@ public class SearchResponseTests
     public void SearchResponse_WithRequiredProperties_ShouldCreate()
     {
         // Arrange & Act
-        var response = new SearchResponse<string>
+        SearchResponse<string> response = new()
         {
             Total = 100,
             Page = 0,
             Size = 10,
             HasMore = true,
-            Results = new List<string> { "result1", "result2" },
+            Results = ["result1", "result2"],
         };
 
         // Assert
@@ -48,8 +48,8 @@ public class SearchResponseTests
     public void SearchResponse_WithWarnings_ShouldCreate()
     {
         // Arrange
-        var warnings = new List<Warning>
-        {
+        List<Warning> warnings =
+        [
             new Warning
             {
                 Code = "WARN001",
@@ -61,16 +61,16 @@ public class SearchResponseTests
                 Code = "WARN002",
                 Message = "Second warning",
             },
-        };
+        ];
 
         // Act
-        var response = new SearchResponse<string>
+        SearchResponse<string> response = new()
         {
             Total = 50,
             Page = 1,
             Size = 25,
             HasMore = true,
-            Results = new List<string> { "result1" },
+            Results = ["result1"],
             Warnings = warnings,
         };
 
@@ -92,8 +92,8 @@ public class SearchResponseTests
     public void SearchResponse_WithSameValues_ShouldBeEqual()
     {
         // Arrange
-        var results = new List<string> { "result1" };
-        var response1 = new SearchResponse<string>
+        List<string> results = ["result1"];
+        SearchResponse<string> response1 = new()
         {
             Total = 10,
             Page = 0,
@@ -102,7 +102,7 @@ public class SearchResponseTests
             Results = results,
         };
 
-        var response2 = new SearchResponse<string>
+        SearchResponse<string> response2 = new()
         {
             Total = 10,
             Page = 0,
@@ -122,17 +122,17 @@ public class SearchResponseTests
     public void SearchResponse_WithExpression_ShouldCreateNewInstance()
     {
         // Arrange
-        var original = new SearchResponse<string>
+        SearchResponse<string> original = new()
         {
             Total = 100,
             Page = 0,
             Size = 10,
             HasMore = true,
-            Results = new List<string> { "result1" },
+            Results = ["result1"],
         };
 
         // Act
-        var modified = original with { Page = 1 };
+        SearchResponse<string> modified = original with { Page = 1 };
 
         // Assert
         original.Page.Should().Be(0);
@@ -149,13 +149,13 @@ public class SearchResponseTests
     public void SearchResponse_WithEmptyResults_ShouldCreate()
     {
         // Arrange & Act
-        var response = new SearchResponse<string>
+        SearchResponse<string> response = new()
         {
             Total = 0,
             Page = 0,
             Size = 10,
             HasMore = false,
-            Results = new List<string>(),
+            Results = [],
         };
 
         // Assert
@@ -172,13 +172,13 @@ public class SearchResponseTests
     public void SearchResponse_WithLastPage_ShouldHaveHasMoreFalse()
     {
         // Arrange & Act
-        var response = new SearchResponse<string>
+        SearchResponse<string> response = new()
         {
             Total = 25,
             Page = 2,
             Size = 10,
             HasMore = false,
-            Results = new List<string> { "result1", "result2", "result3", "result4", "result5" },
+            Results = ["result1", "result2", "result3", "result4", "result5"],
         };
 
         // Assert

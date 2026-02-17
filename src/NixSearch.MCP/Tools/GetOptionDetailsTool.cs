@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,13 +34,12 @@ public partial class GetOptionDetailsTool(
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Option details, or null if not found.</returns>
     [McpServerTool]
-    [Description("Get comprehensive details about a specific NixOS configuration option.")]
-    public async Task<NixOption?> GetOptionDetails(
-        [Description("Full option name (e.g., 'services.nginx.enable')")]
+    public async partial Task<NixOption?> GetOptionDetails(
         string optionName,
-        [Description("NixOS channel (unstable, stable, beta, flakes)")]
+#pragma warning disable CS1066 // ModelContextProtocol WILL use those default values.
         string? channel = "unstable",
         CancellationToken cancellationToken = default)
+#pragma warning restore CS1066
     {
         this.LogGettingOptionDetails(optionName, channel);
 

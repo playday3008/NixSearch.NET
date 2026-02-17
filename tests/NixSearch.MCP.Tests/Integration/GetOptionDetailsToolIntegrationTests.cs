@@ -29,7 +29,7 @@ public class GetOptionDetailsToolIntegrationTests : IntegrationTestBase
 
         // Assert
         result.Should().NotBeNull();
-        result!.Name.Should().Be("services.openssh.enable");
+        result.Name.Should().Be("services.openssh.enable");
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ public class GetOptionDetailsToolIntegrationTests : IntegrationTestBase
 
         // Assert
         result.Should().NotBeNull();
-        result!.Name.Should().Be("networking.hostName");
+        result.Name.Should().Be("networking.hostName");
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public class GetOptionDetailsToolIntegrationTests : IntegrationTestBase
 
         // Assert
         result.Should().NotBeNull();
-        result!.Name.Should().NotBeNullOrEmpty();
+        result.Name.Should().NotBeNullOrEmpty();
         result.Name.Should().Be("boot.loader.grub.enable");
     }
 
@@ -104,7 +104,7 @@ public class GetOptionDetailsToolIntegrationTests : IntegrationTestBase
         resultUpper.Should().NotBeNull();
 
         // Both should return the same option (case-insensitive search)
-        resultLower!.Name.Should().BeEquivalentTo(resultUpper!.Name);
+        resultLower.Name.Should().BeEquivalentTo(resultUpper.Name);
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public class GetOptionDetailsToolIntegrationTests : IntegrationTestBase
 
         // Assert
         result.Should().NotBeNull();
-        result!.Name.Should().Be("services.postgresql.enable");
+        result.Name.Should().Be("services.postgresql.enable");
         result.Type.Should().NotBeNullOrEmpty();
     }
 }

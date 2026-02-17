@@ -31,7 +31,7 @@ public static class NixSearchClientFactory
             .AddEnvironmentVariables("NIXSEARCH_");
 
         // Check for config file in user's home directory
-        string? homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        string homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         if (!string.IsNullOrEmpty(homeDir))
         {
             string userConfigPath = Path.Combine(homeDir, ".config", "nixsearch", "config.json");

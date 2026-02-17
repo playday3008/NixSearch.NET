@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,19 +36,16 @@ public partial class SearchOptionsTool(
     /// <param name="page">Page number (0-indexed).</param>
     /// <param name="size">Number of results per page.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>Search results with option details.</returns>
+    /// <returns>Search results with option details including name, type, default value, example, description, and source location.</returns>
     [McpServerTool]
-    [Description("Search for NixOS configuration options. Returns option details including name, type, default value, example, description, and source location.")]
-    public async Task<SearchResponse<NixOption>> SearchOptions(
-        [Description("Search query (option name, description keywords, etc.)")]
+    public async partial Task<SearchResponse<NixOption>> SearchOptions(
         string query,
-        [Description("NixOS channel to search in (unstable, stable, beta, flakes)")]
+#pragma warning disable CS1066 // ModelContextProtocol WILL use those default values.
         string? channel = "unstable",
-        [Description("Page number (0-indexed)")]
         int? page = 0,
-        [Description("Number of results per page")]
         int? size = 50,
         CancellationToken cancellationToken = default)
+#pragma warning restore CS1066
     {
         this.LogSearchingOptions(query, channel, page, size);
 

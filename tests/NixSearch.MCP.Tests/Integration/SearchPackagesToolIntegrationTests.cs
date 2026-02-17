@@ -194,7 +194,6 @@ public class SearchPackagesToolIntegrationTests : IntegrationTestBase
         if (result.Results.Count > 0)
         {
             result.Results.Should().OnlyContain(p =>
-                p.License != null &&
                 p.License.Any(l => l.FullName != null && l.FullName.Contains("GPL", System.StringComparison.OrdinalIgnoreCase)));
         }
     }
@@ -220,7 +219,6 @@ public class SearchPackagesToolIntegrationTests : IntegrationTestBase
         if (result.Results.Count > 0)
         {
             result.Results.Should().OnlyContain(p =>
-                p.Maintainers != null &&
                 p.Maintainers.Any(m => m.Name == "viric" || (m.Email != null && m.Email.Contains("viric"))));
         }
     }
@@ -246,7 +244,6 @@ public class SearchPackagesToolIntegrationTests : IntegrationTestBase
         if (result.Results.Count > 0)
         {
             result.Results.Should().OnlyContain(p =>
-                p.Teams != null &&
                 p.Teams.Any(t => t.ShortName != null && t.ShortName.Contains("freedesktop", System.StringComparison.OrdinalIgnoreCase)));
         }
     }

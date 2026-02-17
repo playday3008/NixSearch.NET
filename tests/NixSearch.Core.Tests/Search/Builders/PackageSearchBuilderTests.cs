@@ -190,7 +190,7 @@ public class PackageSearchBuilderTests
         // Act
         await builder
             .WithQuery("test")
-            .SortBy(Nest.SortOrder.Ascending)
+            .SortBy(SortOrder.Ascending)
             .ExecuteAsync(TestContext.Current.CancellationToken);
 
         // Assert
@@ -221,7 +221,7 @@ public class PackageSearchBuilderTests
             .WithTeam("python-team")
             .WithPlatform("x86_64-linux", "aarch64-darwin")
             .Page(0, 50)
-            .SortBy(Nest.SortOrder.Descending);
+            .SortBy(SortOrder.Descending);
 
         // Assert
         result.Should().BeSameAs(builder);

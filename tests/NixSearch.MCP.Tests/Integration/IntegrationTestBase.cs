@@ -6,9 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-using NixSearch.Core.Configuration;
 using NixSearch.Core.Extensions;
-using NixSearch.Core.Search;
 using NixSearch.MCP.Tools;
 
 namespace NixSearch.MCP.Tests.Integration;
@@ -95,7 +93,7 @@ public abstract class IntegrationTestBase : IDisposable
     {
         if (disposing)
         {
-            this.serviceProvider?.Dispose();
+            this.serviceProvider.Dispose();
         }
     }
 }

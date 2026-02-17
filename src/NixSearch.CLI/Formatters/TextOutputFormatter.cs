@@ -30,11 +30,11 @@ public class TextOutputFormatter<T> : IOutputFormatter<T>
         {
             if (doc is NixPackage package)
             {
-                TextOutputFormatter<T>.FormatPackage(sb, package, detailed);
+                FormatPackage(sb, package, detailed);
             }
             else if (doc is NixOption option)
             {
-                TextOutputFormatter<T>.FormatOption(sb, option, detailed);
+                FormatOption(sb, option, detailed);
             }
 
             sb.AppendLine();
@@ -56,12 +56,12 @@ public class TextOutputFormatter<T> : IOutputFormatter<T>
 
         if (detailed)
         {
-            if (package.Platforms?.Length > 0)
+            if (package.Platforms.Length > 0)
             {
                 sb.AppendInvariantLine($"  Platforms: {string.Join(", ", package.Platforms)}");
             }
 
-            if (package.Programs?.Length > 0)
+            if (package.Programs.Length > 0)
             {
                 sb.AppendInvariantLine($"  Programs: {string.Join(", ", package.Programs)}");
             }
@@ -71,18 +71,19 @@ public class TextOutputFormatter<T> : IOutputFormatter<T>
                 sb.AppendInvariantLine($"  Main Program: {package.MainProgram}");
             }
 
-            if (package.License?.Length > 0)
+            if (package.License.Length > 0)
             {
                 IEnumerable<string?> licenses = package.License.Select(l => l.FullName).Where(l => l != null);
                 sb.AppendInvariantLine($"  License: {string.Join(", ", licenses)}");
             }
 
-            if (package.Maintainers?.Length > 0)
+            if (package.Maintainers.Length > 0)
             {
                 IEnumerable<string?> maintainers = package.Maintainers.Select(m => m.Name ?? m.Email).Where(m => m != null);
-                if (maintainers.Any())
+                IEnumerable<string?> enumerable = maintainers.ToList();
+                if (enumerable.Any())
                 {
-                    sb.AppendInvariantLine($"  Maintainers: {string.Join(", ", maintainers)}");
+                    sb.AppendInvariantLine($"  Maintainers: {string.Join(", ", enumerable)}");
                 }
             }
 
@@ -146,7 +147,7 @@ public class TextOutputFormatter<T> : IOutputFormatter<T>
 
             if (option.Flake != null)
             {
-                var flakeValue = option.Flake.Match(
+                string? flakeValue = option.Flake.Match(
                     str => str,
                     arr => arr?.Length > 0 ? string.Join(", ", arr) : null);
 

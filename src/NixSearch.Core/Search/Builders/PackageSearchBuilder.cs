@@ -44,6 +44,9 @@ internal sealed class PackageSearchBuilder(
         string version = BaseModel.GetPropertyName<NixPackage>(p => p.Version);
         string flake = BaseModel.GetPropertyName<NixOption>(o => o.FlakeName);
 
+        // Suppress unused variablea warning since version is not currently used in search queries, but may be in the future
+        _ = version;
+
         // Weights are taken from official Nixpkgs search frontend
         return [
             $"{attrName}^9",
@@ -175,11 +178,11 @@ internal sealed class PackageSearchBuilder(
                                     .Wildcard(wc => wc
                                         .Field(attrName)
                                         .Value($"*{this.Query}*")
-                                        .CaseInsensitive(true)))))))
-            .Aggregations(aggs => this.GetAggregations())
+                                        .CaseInsensitive()))))))
+            .Aggregations(_ => this.GetAggregations())
             .From(this.From)
             .Size(this.Size)
-            .Sort(s => sortDescriptor);
+            .Sort(_ => sortDescriptor);
     }
 
     private static QueryContainer[] GetShouldQueries(string name, in List<string> values)

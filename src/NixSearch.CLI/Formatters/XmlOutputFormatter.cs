@@ -25,15 +25,15 @@ public class XmlOutputFormatter<T> : IOutputFormatter<T>
     /// <inheritdoc/>
     public string Format(ISearchResponse<T> response, bool detailed)
     {
-        SearchResult<T>? result = new()
+        SearchResult<T> result = new()
         {
             Total = response.Total,
             Results = [.. response.Documents],
         };
 
-        XmlSerializer? serializer = new(typeof(SearchResult<T>));
-        using StringWriter? stringWriter = new();
-        using XmlWriter? xmlWriter = XmlWriter.Create(stringWriter, Options);
+        XmlSerializer serializer = new(typeof(SearchResult<T>));
+        using StringWriter stringWriter = new();
+        using XmlWriter xmlWriter = XmlWriter.Create(stringWriter, Options);
         serializer.Serialize(xmlWriter, result);
         return stringWriter.ToString();
     }

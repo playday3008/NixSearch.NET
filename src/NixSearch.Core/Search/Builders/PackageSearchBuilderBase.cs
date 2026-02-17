@@ -58,11 +58,6 @@ public abstract class PackageSearchBuilderBase(
     /// <returns>The builder instance for fluent chaining.</returns>
     public PackageSearchBuilderBase WithPackageSet(params string[] sets)
     {
-        if (sets is null)
-        {
-            return this;
-        }
-
         this.Attributes.AddRange(sets);
         return this;
     }
@@ -74,11 +69,6 @@ public abstract class PackageSearchBuilderBase(
     /// <returns>The builder instance for fluent chaining.</returns>
     public PackageSearchBuilderBase WithLicense(params string[] licenses)
     {
-        if (licenses is null)
-        {
-            return this;
-        }
-
         this.Licenses.AddRange(licenses);
         return this;
     }
@@ -90,11 +80,6 @@ public abstract class PackageSearchBuilderBase(
     /// <returns>The builder instance for fluent chaining.</returns>
     public PackageSearchBuilderBase WithMaintainer(params string[] maintainers)
     {
-        if (maintainers is null)
-        {
-            return this;
-        }
-
         this.Maintainers.AddRange(maintainers);
         return this;
     }
@@ -106,11 +91,6 @@ public abstract class PackageSearchBuilderBase(
     /// <returns>The builder instance for fluent chaining.</returns>
     public PackageSearchBuilderBase WithTeam(params string[] teams)
     {
-        if (teams is null)
-        {
-            return this;
-        }
-
         this.Teams.AddRange(teams);
         return this;
     }
@@ -122,11 +102,6 @@ public abstract class PackageSearchBuilderBase(
     /// <returns>The builder instance for fluent chaining.</returns>
     public PackageSearchBuilderBase WithPlatform(params string[] platforms)
     {
-        if (platforms is null)
-        {
-            return this;
-        }
-
         this.Platforms.AddRange(platforms);
         return this;
     }

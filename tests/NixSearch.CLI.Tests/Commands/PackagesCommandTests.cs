@@ -88,19 +88,19 @@ public class PackagesCommandTests
         Command command = PackagesCommand.Create();
 
         // Assert
-        var platformOption = command.Options.First(o => o.Name == "--platform");
+        Option platformOption = command.Options.First(o => o.Name == "--platform");
         platformOption.Should().BeOfType<Option<string[]?>>();
 
-        var packageSetOption = command.Options.First(o => o.Name == "--package-set");
+        Option packageSetOption = command.Options.First(o => o.Name == "--package-set");
         packageSetOption.Should().BeOfType<Option<string[]?>>();
 
-        var licenseOption = command.Options.First(o => o.Name == "--license");
+        Option licenseOption = command.Options.First(o => o.Name == "--license");
         licenseOption.Should().BeOfType<Option<string[]?>>();
 
-        var maintainerOption = command.Options.First(o => o.Name == "--maintainer");
+        Option maintainerOption = command.Options.First(o => o.Name == "--maintainer");
         maintainerOption.Should().BeOfType<Option<string[]?>>();
 
-        var teamOption = command.Options.First(o => o.Name == "--team");
+        Option teamOption = command.Options.First(o => o.Name == "--team");
         teamOption.Should().BeOfType<Option<string[]?>>();
     }
 
@@ -114,19 +114,19 @@ public class PackagesCommandTests
         Command command = PackagesCommand.Create();
 
         // Assert
-        var platformOption = command.Options.First(o => o.Name == "--platform");
+        Option platformOption = command.Options.First(o => o.Name == "--platform");
         platformOption.Description.Should().Contain("platform");
 
-        var packageSetOption = command.Options.First(o => o.Name == "--package-set");
+        Option packageSetOption = command.Options.First(o => o.Name == "--package-set");
         packageSetOption.Description.Should().Contain("package set");
 
-        var licenseOption = command.Options.First(o => o.Name == "--license");
+        Option licenseOption = command.Options.First(o => o.Name == "--license");
         licenseOption.Description.Should().Contain("license");
 
-        var maintainerOption = command.Options.First(o => o.Name == "--maintainer");
+        Option maintainerOption = command.Options.First(o => o.Name == "--maintainer");
         maintainerOption.Description.Should().Contain("maintainer");
 
-        var teamOption = command.Options.First(o => o.Name == "--team");
+        Option teamOption = command.Options.First(o => o.Name == "--team");
         teamOption.Description.Should().Contain("team");
     }
 }

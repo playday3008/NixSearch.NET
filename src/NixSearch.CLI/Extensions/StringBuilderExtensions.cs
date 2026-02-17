@@ -53,24 +53,26 @@ public static class StringBuilderExtensions
         /// <summary>
         /// Appends a literal string.
         /// </summary>
-        /// <param name="str">The string to append.</param>
-        public readonly void AppendLiteral(string str) =>
-            this.stringBuilder.Append(str);
+        /// <param name="value">The string to append.</param>
+        public void AppendLiteral(string value) =>
+            this.stringBuilder.Append(value);
+
+        /// <summary>
+        /// Appends a formatted value.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <typeparam name="T">The type of the value to append.</typeparam>
+        public void AppendFormatted<T>(T value) =>
+            this.stringBuilder.Append(value);
 
         /// <summary>
         /// Appends a formatted IFormattable value using invariant culture.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
-        public readonly void AppendFormatted(IFormattable value, string format) =>
+        /// <typeparam name="T">The type of the value to write.</typeparam>
+        public void AppendFormatted<T>(T value, string? format)
+            where T : IFormattable =>
             this.stringBuilder.Append(value.ToString(format, CultureInfo.InvariantCulture));
-
-        /// <summary>
-        /// Appends a formatted value.
-        /// </summary>
-        /// <typeparam name="T">The type of the value.</typeparam>
-        /// <param name="value">The value to append.</param>
-        public readonly void AppendFormatted<T>(T value) =>
-            this.stringBuilder.Append(value);
     }
 }

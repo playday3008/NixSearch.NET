@@ -149,7 +149,7 @@ public class OptionSearchBuilderTests
         // Act
         await builder
             .WithQuery("networking")
-            .SortBy(Nest.SortOrder.Ascending)
+            .SortBy(SortOrder.Ascending)
             .ExecuteAsync(TestContext.Current.CancellationToken);
 
         // Assert
@@ -175,7 +175,7 @@ public class OptionSearchBuilderTests
             .WithQuery("boot")
             .ForChannel(NixChannel.FromValue("nixos-24.11"))
             .Page(0, 100)
-            .SortBy(Nest.SortOrder.Descending);
+            .SortBy(SortOrder.Descending);
 
         // Assert
         result.Should().BeSameAs(builder);

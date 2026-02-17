@@ -39,7 +39,7 @@ public abstract class SearchBuilderBase<TSource, TBuilder>
     protected SearchBuilderBase(IElasticClient client, IOptions<NixSearchOptions> options)
     {
         ArgumentNullException.ThrowIfNull(client);
-        ArgumentNullException.ThrowIfNull(options?.Value);
+        ArgumentNullException.ThrowIfNull(options.Value);
 
         this.Client = client;
         this.Configuration = options.Value;
@@ -98,11 +98,6 @@ public abstract class SearchBuilderBase<TSource, TBuilder>
     /// <returns>The builder instance for fluent chaining.</returns>
     public TBuilder WithQuery(in string query)
     {
-        if (query is null)
-        {
-            return (TBuilder)this;
-        }
-
         this.Query = query;
         return (TBuilder)this;
     }
@@ -223,9 +218,9 @@ public abstract class SearchBuilderBase<TSource, TBuilder>
     private static bool IsTransientException(Exception ex)
     {
         return ex is System.Net.Http.HttpRequestException
-            || ex is System.Net.Sockets.SocketException
-            || ex is System.IO.IOException
-            || ex is System.Threading.Tasks.TaskCanceledException;
+            or System.Net.Sockets.SocketException
+            or System.IO.IOException
+            or TaskCanceledException;
     }
 
     /// <summary>

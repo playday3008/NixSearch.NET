@@ -5,7 +5,6 @@ using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using NixSearch.Core.Configuration;
 using NixSearch.Core.Extensions;
 using NixSearch.Core.Search;
 
@@ -62,7 +61,7 @@ public abstract class IntegrationTestBase : IDisposable
     {
         if (disposing)
         {
-            this.serviceProvider?.Dispose();
+            this.serviceProvider.Dispose();
         }
     }
 }

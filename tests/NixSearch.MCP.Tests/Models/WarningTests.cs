@@ -20,7 +20,7 @@ public class WarningTests
     public void Warning_WithRequiredProperties_ShouldCreate()
     {
         // Arrange & Act
-        var warning = new Warning
+        Warning warning = new()
         {
             Code = "WARN001",
             Message = "This is a warning message",
@@ -40,7 +40,7 @@ public class WarningTests
     public void Warning_WithParameter_ShouldCreate()
     {
         // Arrange & Act
-        var warning = new Warning
+        Warning warning = new()
         {
             Code = "WARN002",
             Message = "Invalid parameter value",
@@ -61,14 +61,14 @@ public class WarningTests
     public void Warning_WithSameValues_ShouldBeEqual()
     {
         // Arrange
-        var warning1 = new Warning
+        Warning warning1 = new()
         {
             Code = "WARN001",
             Message = "Test message",
             Parameter = "test",
         };
 
-        var warning2 = new Warning
+        Warning warning2 = new()
         {
             Code = "WARN001",
             Message = "Test message",
@@ -87,13 +87,13 @@ public class WarningTests
     public void Warning_WithDifferentValues_ShouldNotBeEqual()
     {
         // Arrange
-        var warning1 = new Warning
+        Warning warning1 = new()
         {
             Code = "WARN001",
             Message = "Test message",
         };
 
-        var warning2 = new Warning
+        Warning warning2 = new()
         {
             Code = "WARN002",
             Message = "Different message",
@@ -111,14 +111,14 @@ public class WarningTests
     public void Warning_WithNullParameter_ShouldNotEqualWarningWithParameter()
     {
         // Arrange
-        var warning1 = new Warning
+        Warning warning1 = new()
         {
             Code = "WARN001",
             Message = "Test message",
             Parameter = null,
         };
 
-        var warning2 = new Warning
+        Warning warning2 = new()
         {
             Code = "WARN001",
             Message = "Test message",
@@ -136,14 +136,14 @@ public class WarningTests
     public void Warning_WithExpression_ShouldCreateNewInstance()
     {
         // Arrange
-        var original = new Warning
+        Warning original = new()
         {
             Code = "WARN001",
             Message = "Original message",
         };
 
         // Act
-        var modified = original with { Message = "Modified message" };
+        Warning modified = original with { Message = "Modified message" };
 
         // Assert
         original.Code.Should().Be("WARN001");

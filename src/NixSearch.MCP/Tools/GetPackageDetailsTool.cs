@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,13 +37,12 @@ public partial class GetPackageDetailsTool(
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Package details, or null if not found.</returns>
     [McpServerTool]
-    [Description("Get comprehensive details about a specific NixOS package by its attribute name.")]
-    public async Task<NixPackage?> GetPackageDetails(
-        [Description("Package attribute name (e.g., 'firefox', 'python3Packages.numpy')")]
+    public async partial Task<NixPackage?> GetPackageDetails(
         string attrName,
-        [Description("NixOS channel (unstable, stable, beta, flakes)")]
+#pragma warning disable CS1066 // ModelContextProtocol WILL use those default values.
         string? channel = "unstable",
         CancellationToken cancellationToken = default)
+#pragma warning restore CS1066
     {
         this.LogGettingPackageDetails(attrName, channel);
 

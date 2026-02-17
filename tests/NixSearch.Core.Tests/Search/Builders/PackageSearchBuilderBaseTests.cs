@@ -430,8 +430,8 @@ public class PackageSearchBuilderBaseTests
                             .MultiMatch(mm => mm
                                 .Query(this.Query)
                                 .Fields(this.GetMatchFields())))))
-                .Aggregations(aggs => this.GetAggregations())
-                .Sort(s => this.GetSortDescriptor());
+                .Aggregations(_ => this.GetAggregations())
+                .Sort(_ => this.GetSortDescriptor());
         }
     }
 }

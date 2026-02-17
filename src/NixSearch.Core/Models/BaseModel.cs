@@ -25,8 +25,7 @@ public abstract record BaseModel
     {
         if (expr.Body is not MemberExpression memberExpression)
         {
-            if (expr.Body is UnaryExpression unaryExpression &&
-                unaryExpression.Operand is MemberExpression unaryMemberExpression)
+            if (expr.Body is UnaryExpression { Operand: MemberExpression unaryMemberExpression })
             {
                 memberExpression = unaryMemberExpression;
             }

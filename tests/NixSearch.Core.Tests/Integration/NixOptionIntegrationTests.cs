@@ -78,7 +78,7 @@ public sealed class NixOptionIntegrationTests : IntegrationTestBase
             .FirstOrDefault(o => !string.IsNullOrEmpty(o.Description));
 
         optionWithDescription.Should().NotBeNull();
-        optionWithDescription!.Description.Should().NotBeNullOrEmpty();
+        optionWithDescription.Description.Should().NotBeNullOrEmpty();
     }
 
     /// <summary>
@@ -100,7 +100,7 @@ public sealed class NixOptionIntegrationTests : IntegrationTestBase
             .FirstOrDefault(o => !string.IsNullOrEmpty(o.Type));
 
         optionWithType.Should().NotBeNull();
-        optionWithType!.Type.Should().NotBeNullOrEmpty();
+        optionWithType.Type.Should().NotBeNullOrEmpty();
     }
 
     /// <summary>
@@ -122,7 +122,7 @@ public sealed class NixOptionIntegrationTests : IntegrationTestBase
             .FirstOrDefault(o => !string.IsNullOrEmpty(o.Default));
 
         optionWithDefault.Should().NotBeNull();
-        optionWithDefault!.Default.Should().NotBeNullOrEmpty();
+        optionWithDefault.Default.Should().NotBeNullOrEmpty();
     }
 
     /// <summary>
@@ -144,7 +144,7 @@ public sealed class NixOptionIntegrationTests : IntegrationTestBase
             .FirstOrDefault(o => !string.IsNullOrEmpty(o.Example));
 
         optionWithExample.Should().NotBeNull();
-        optionWithExample!.Example.Should().NotBeNullOrEmpty();
+        optionWithExample.Example.Should().NotBeNullOrEmpty();
     }
 
     /// <summary>
@@ -166,7 +166,7 @@ public sealed class NixOptionIntegrationTests : IntegrationTestBase
             .FirstOrDefault(o => !string.IsNullOrEmpty(o.Source));
 
         optionWithSource.Should().NotBeNull();
-        optionWithSource!.Source.Should().NotBeNullOrEmpty();
+        optionWithSource.Source.Should().NotBeNullOrEmpty();
     }
 
     /// <summary>
@@ -193,7 +193,7 @@ public sealed class NixOptionIntegrationTests : IntegrationTestBase
         optionWithFlake.Should().NotBeNull();
         optionWithFlake.Flake.Should().NotBeNull();
 
-        optionWithFlake!.Flake!.Match(
+        optionWithFlake.Flake.Match(
             single => single.Should().NotBeNullOrEmpty(),
             multiple =>
             {
@@ -294,7 +294,7 @@ public sealed class NixOptionIntegrationTests : IntegrationTestBase
                 !string.IsNullOrEmpty(o.Type));
 
         comprehensiveOption.Should().NotBeNull();
-        comprehensiveOption!.Name.Should().NotBeNullOrEmpty();
+        comprehensiveOption.Name.Should().NotBeNullOrEmpty();
         comprehensiveOption.Description.Should().NotBeNullOrEmpty();
         comprehensiveOption.Type.Should().NotBeNullOrEmpty();
     }

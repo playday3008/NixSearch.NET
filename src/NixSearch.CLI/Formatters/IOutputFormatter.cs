@@ -8,7 +8,7 @@ namespace NixSearch.CLI.Formatters;
 /// Interface for output formatters.
 /// </summary>
 /// <typeparam name="T">The type of results to format.</typeparam>
-public interface IOutputFormatter<T>
+public interface IOutputFormatter<in T>
     where T : class
 {
     /// <summary>

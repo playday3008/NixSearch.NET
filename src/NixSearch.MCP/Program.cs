@@ -37,12 +37,12 @@ builder.Services.AddMcpServer()
     {
         // Enable stateless mode by default for a read-only search API
         // This eliminates session timeout issues since each request is independent
-        options.Stateless = builder.Configuration.GetValue<bool>("MCP:Stateless", defaultValue: true);
+        options.Stateless = builder.Configuration.GetValue("MCP:Stateless", defaultValue: true);
 
         // If not stateless, configure a longer idle timeout (default 24 hours)
         if (!options.Stateless)
         {
-            TimeSpan idleTimeout = builder.Configuration.GetValue<TimeSpan>(
+            TimeSpan idleTimeout = builder.Configuration.GetValue(
                 "MCP:IdleTimeout",
                 defaultValue: TimeSpan.FromHours(24));
             options.IdleTimeout = idleTimeout;
@@ -95,21 +95,21 @@ app.MapGet("/info", () => Results.Ok(new
         health = "/health",
         info = "/info",
     },
-    tools = tools,
+    tools,
 }));
 
 ILogger<Program> startupLogger = app.Services.GetRequiredService<ILogger<Program>>();
 startupLogger.LogStartingMcpServer();
 startupLogger.LogAvailableTools(string.Join(", ", tools));
 
-bool isStateless = builder.Configuration.GetValue<bool>("MCP:Stateless", defaultValue: true);
+bool isStateless = builder.Configuration.GetValue("MCP:Stateless", defaultValue: true);
 if (isStateless)
 {
     startupLogger.LogStatelessMode();
 }
 else
 {
-    TimeSpan idleTimeout = builder.Configuration.GetValue<TimeSpan>(
+    TimeSpan idleTimeout = builder.Configuration.GetValue(
         "MCP:IdleTimeout",
         defaultValue: TimeSpan.FromHours(24));
     startupLogger.LogStatefulMode(idleTimeout);

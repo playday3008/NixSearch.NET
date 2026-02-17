@@ -541,8 +541,6 @@ public class SearchBuilderBaseTests
 
         public SortOrder? GetOrder() => this.Order;
 
-        public new string GetIndexName() => base.GetIndexName();
-
         protected override string[] GetMatchFields() => [
             "package_attr_name",
             "package_pname"
@@ -565,7 +563,9 @@ public class SearchBuilderBaseTests
                     .MultiMatch(m => m
                         .Query(this.Query)
                         .Fields(this.GetMatchFields())))
-                .Sort(s => this.GetSortDescriptor());
+                .Sort(_ => this.GetSortDescriptor());
         }
+
+        private new string GetIndexName() => base.GetIndexName();
     }
 }

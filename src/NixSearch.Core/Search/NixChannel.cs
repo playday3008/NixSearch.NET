@@ -10,7 +10,7 @@ namespace NixSearch.Core.Search;
 /// <summary>
 /// Represents a NixOS channel.
 /// </summary>
-public partial struct NixChannel : IEquatable<NixChannel>
+public readonly partial struct NixChannel : IEquatable<NixChannel>
 {
     private const string UnstableValue = "nixos-unstable";
     private const string FlakesValue = "group-manual";
@@ -35,22 +35,22 @@ public partial struct NixChannel : IEquatable<NixChannel>
     /// <summary>
     /// Gets a value indicating whether this channel is a stable release channel (e.g., nixos-24.11).
     /// </summary>
-    public readonly bool IsStable => this.Value is not null && StablePattern().IsMatch(this.Value);
+    public bool IsStable => this.Value is not null && StablePattern().IsMatch(this.Value);
 
     /// <summary>
     /// Gets a value indicating whether this channel is a beta release channel (e.g., nixos-25.11-beta).
     /// </summary>
-    public readonly bool IsBeta => this.Value is not null && BetaPattern().IsMatch(this.Value);
+    public bool IsBeta => this.Value is not null && BetaPattern().IsMatch(this.Value);
 
     /// <summary>
     /// Gets a value indicating whether this channel is the unstable channel.
     /// </summary>
-    public readonly bool IsUnstable => string.Equals(this.Value, UnstableValue, StringComparison.Ordinal);
+    public bool IsUnstable => string.Equals(this.Value, UnstableValue, StringComparison.Ordinal);
 
     /// <summary>
     /// Gets a value indicating whether this channel is the flakes channel.
     /// </summary>
-    public readonly bool IsFlakes => string.Equals(this.Value, FlakesValue, StringComparison.Ordinal);
+    public bool IsFlakes => string.Equals(this.Value, FlakesValue, StringComparison.Ordinal);
 
     /// <summary>
     /// Equality operator.
@@ -113,16 +113,16 @@ public partial struct NixChannel : IEquatable<NixChannel>
     /// Returns the string representation of the channel.
     /// </summary>
     /// <returns>The string representation of the channel.</returns>
-    public override readonly string ToString() => this.Value;
+    public override string ToString() => this.Value;
 
     /// <inheritdoc/>
-    public readonly bool Equals(NixChannel other) => string.Equals(this.Value, other.Value, StringComparison.Ordinal);
+    public bool Equals(NixChannel other) => string.Equals(this.Value, other.Value, StringComparison.Ordinal);
 
     /// <inheritdoc/>
-    public override readonly bool Equals(object? obj) => obj is NixChannel other && this.Equals(other);
+    public override bool Equals(object? obj) => obj is NixChannel other && this.Equals(other);
 
     /// <inheritdoc/>
-    public override readonly int GetHashCode() => this.Value is not null ? StringComparer.Ordinal.GetHashCode(this.Value) : 0;
+    public override int GetHashCode() => this.Value is not null ? StringComparer.Ordinal.GetHashCode(this.Value) : 0;
 
     [GeneratedRegex(@"^nixos-\d+\.\d+$")]
     private static partial Regex StablePattern();
