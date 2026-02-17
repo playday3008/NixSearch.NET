@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 
 using System;
+using System.Collections.Generic;
 using System.CommandLine;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Nest;
 
@@ -18,13 +21,14 @@ public abstract class BaseSearchCommand<T>
     where T : class
 {
     /// <summary>
-    /// Parses the channel string into a NixChannel.
+    /// Parses the channel string into a NixChannel using available channels from discovery.
     /// </summary>
     /// <param name="channel">The channel string to parse.</param>
+    /// <param name="availableChannels">The available channels from discovery.</param>
     /// <returns>The parsed NixChannel.</returns>
-    internal static NixChannel ParseChannel(string channel)
+    internal static NixChannel ParseChannel(string channel, IReadOnlyList<NixChannel> availableChannels)
     {
-        return NixChannel.Parse(channel);
+        return NixChannel.Parse(channel, availableChannels);
     }
 
     /// <summary>
@@ -76,7 +80,7 @@ public abstract class BaseSearchCommand<T>
         // Common options
         Option<string> channelOption = new("--channel")
         {
-            Description = "The NixOS channel to search (unstable, stable, flakes)",
+            Description = "The NixOS channel to search (unstable, stable, beta, flakes)",
             DefaultValueFactory = _ => "unstable",
         };
 
@@ -123,7 +127,7 @@ public abstract class BaseSearchCommand<T>
         // Add command-specific options
         this.AddSpecificOptions(command);
 
-        command.SetAction((parseResult) =>
+        command.SetAction(async (parseResult, cancellationToken) =>
         {
             var query = parseResult.GetValue(queryArgument);
             var channel = parseResult.GetValue(channelOption);
@@ -133,7 +137,7 @@ public abstract class BaseSearchCommand<T>
             var format = parseResult.GetValue(formatOption);
             var detailed = parseResult.GetValue(detailedOption);
 
-            this.Execute(parseResult, query!, channel!, from, size, sort, format, detailed);
+            await this.ExecuteAsync(parseResult, query!, channel!, from, size, sort, format, detailed, cancellationToken);
         });
 
         return command;
@@ -148,7 +152,7 @@ public abstract class BaseSearchCommand<T>
     }
 
     /// <summary>
-    /// Executes the specific search logic.
+    /// Executes the specific search logic asynchronously.
     /// </summary>
     /// <param name="parseResult">The parse result for accessing command-specific options.</param>
     /// <param name="client">The NixSearch client.</param>
@@ -157,20 +161,22 @@ public abstract class BaseSearchCommand<T>
     /// <param name="from">The starting offset.</param>
     /// <param name="size">The number of results.</param>
     /// <param name="sortOrder">The sort order.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The search response.</returns>
-    protected abstract ISearchResponse<T> ExecuteSearch(
+    protected abstract Task<ISearchResponse<T>> ExecuteSearchAsync(
         ParseResult parseResult,
         INixSearchClient client,
         string query,
         NixChannel channel,
         int from,
         int size,
-        SortOrder? sortOrder);
+        SortOrder? sortOrder,
+        CancellationToken cancellationToken);
 
     /// <summary>
-    /// Executes the search command.
+    /// Executes the search command asynchronously.
     /// </summary>
-    private void Execute(
+    private async Task ExecuteAsync(
         ParseResult parseResult,
         string query,
         string channel,
@@ -178,15 +184,18 @@ public abstract class BaseSearchCommand<T>
         int size,
         string? sort,
         OutputFormat format,
-        bool detailed)
+        bool detailed,
+        CancellationToken cancellationToken)
     {
         try
         {
-            NixChannel nixChannel = ParseChannel(channel);
+            INixSearchClient client = NixSearchClientFactory.Create();
+            IReadOnlyList<NixChannel> availableChannels = await client.GetChannelsAsync(cancellationToken);
+
+            NixChannel nixChannel = ParseChannel(channel, availableChannels);
             SortOrder? sortOrder = ParseSortOrder(sort);
 
-            INixSearchClient client = NixSearchClientFactory.Create();
-            ISearchResponse<T> response = this.ExecuteSearch(parseResult, client, query, nixChannel, from, size, sortOrder);
+            ISearchResponse<T> response = await this.ExecuteSearchAsync(parseResult, client, query, nixChannel, from, size, sortOrder, cancellationToken);
 
             IOutputFormatter<T> formatter = CreateFormatter(format);
             string output = formatter.Format(response, detailed);

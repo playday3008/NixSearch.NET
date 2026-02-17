@@ -34,7 +34,7 @@ public partial class GetPackageDetailsTool(
     /// Gets comprehensive details about a specific NixOS package.
     /// </summary>
     /// <param name="attrName">Package attribute name (e.g., 'firefox', 'python3Packages.numpy').</param>
-    /// <param name="channel">NixOS channel (unstable, stable, flakes).</param>
+    /// <param name="channel">NixOS channel (unstable, stable, beta, flakes).</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Package details, or null if not found.</returns>
     [McpServerTool]
@@ -42,7 +42,7 @@ public partial class GetPackageDetailsTool(
     public async Task<NixPackage?> GetPackageDetails(
         [Description("Package attribute name (e.g., 'firefox', 'python3Packages.numpy')")]
         string attrName,
-        [Description("NixOS channel (unstable, stable, flakes)")]
+        [Description("NixOS channel (unstable, stable, beta, flakes)")]
         string? channel = "unstable",
         CancellationToken cancellationToken = default)
     {

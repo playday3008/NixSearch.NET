@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 
 using System.CommandLine;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Nest;
 
@@ -77,14 +79,15 @@ public class PackagesCommand : BaseSearchCommand<NixPackage>
     }
 
     /// <inheritdoc/>
-    protected override ISearchResponse<NixPackage> ExecuteSearch(
+    protected override async Task<ISearchResponse<NixPackage>> ExecuteSearchAsync(
         ParseResult parseResult,
         INixSearchClient client,
         string query,
         NixChannel channel,
         int from,
         int size,
-        SortOrder? sortOrder)
+        SortOrder? sortOrder,
+        CancellationToken cancellationToken)
     {
         PackageSearchBuilderBase builder = client.Packages()
             .WithQuery(query)
@@ -122,6 +125,6 @@ public class PackagesCommand : BaseSearchCommand<NixPackage>
             builder.WithTeam(teams);
         }
 
-        return builder.Execute();
+        return await builder.ExecuteAsync(cancellationToken);
     }
 }

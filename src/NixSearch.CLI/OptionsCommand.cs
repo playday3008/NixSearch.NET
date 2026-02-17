@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 
 using System.CommandLine;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Nest;
 
@@ -25,14 +27,15 @@ public class OptionsCommand : BaseSearchCommand<NixOption>
     }
 
     /// <inheritdoc/>
-    protected override ISearchResponse<NixOption> ExecuteSearch(
+    protected override async Task<ISearchResponse<NixOption>> ExecuteSearchAsync(
         ParseResult parseResult,
         INixSearchClient client,
         string query,
         NixChannel channel,
         int from,
         int size,
-        SortOrder? sortOrder)
+        SortOrder? sortOrder,
+        CancellationToken cancellationToken)
     {
         OptionSearchBuilder builder = client.Options()
             .WithQuery(query)
@@ -40,6 +43,6 @@ public class OptionsCommand : BaseSearchCommand<NixOption>
             .Page(from, size)
             .SortBy(sortOrder);
 
-        return builder.Execute();
+        return await builder.ExecuteAsync(cancellationToken);
     }
 }

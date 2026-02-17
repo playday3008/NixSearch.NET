@@ -31,7 +31,7 @@ public partial class GetOptionDetailsTool(
     /// Gets comprehensive details about a specific NixOS configuration option.
     /// </summary>
     /// <param name="optionName">Full option name (e.g., 'services.nginx.enable').</param>
-    /// <param name="channel">NixOS channel (unstable, stable, flakes).</param>
+    /// <param name="channel">NixOS channel (unstable, stable, beta, flakes).</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Option details, or null if not found.</returns>
     [McpServerTool]
@@ -39,7 +39,7 @@ public partial class GetOptionDetailsTool(
     public async Task<NixOption?> GetOptionDetails(
         [Description("Full option name (e.g., 'services.nginx.enable')")]
         string optionName,
-        [Description("NixOS channel (unstable, stable, flakes)")]
+        [Description("NixOS channel (unstable, stable, beta, flakes)")]
         string? channel = "unstable",
         CancellationToken cancellationToken = default)
     {

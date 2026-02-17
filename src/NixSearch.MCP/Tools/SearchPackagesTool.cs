@@ -33,7 +33,7 @@ public partial class SearchPackagesTool(
     /// Searches for NixOS packages in nixpkgs.
     /// </summary>
     /// <param name="query">Search query (package name, description keywords, etc.).</param>
-    /// <param name="channel">NixOS channel to search in (unstable, stable, flakes).</param>
+    /// <param name="channel">NixOS channel to search in (unstable, stable, beta, flakes).</param>
     /// <param name="platform">Filter by platforms (e.g., x86_64-linux, aarch64-darwin).</param>
     /// <param name="packageSet">Filter by package sets (e.g., python3Packages, haskellPackages).</param>
     /// <param name="license">Filter by license names.</param>
@@ -48,7 +48,7 @@ public partial class SearchPackagesTool(
     public async Task<SearchResponse<NixPackage>> SearchPackages(
         [Description("Search query (package name, description keywords, etc.)")]
         string query,
-        [Description("NixOS channel to search in (unstable, stable, flakes)")]
+        [Description("NixOS channel to search in (unstable, stable, beta, flakes)")]
         string? channel = "unstable",
         [Description("Filter by platforms (e.g., x86_64-linux, aarch64-darwin)")]
         string[]? platform = null,

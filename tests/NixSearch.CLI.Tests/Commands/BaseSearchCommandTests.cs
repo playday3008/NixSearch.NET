@@ -3,9 +3,12 @@
 #pragma warning disable CA1707 // Identifiers should not contain underscores
 
 using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using FluentAssertions;
 
@@ -22,6 +25,13 @@ namespace NixSearch.CLI.Tests.Commands;
 /// </summary>
 public class BaseSearchCommandTests
 {
+    private static readonly List<NixChannel> AllChannels =
+    [
+        NixChannel.Unstable,
+        NixChannel.FromValue("nixos-24.11"),
+        NixChannel.Flakes,
+    ];
+
     /// <summary>
     /// CreateCommand should create a command with correct name and description.
     /// </summary>
@@ -141,23 +151,10 @@ public class BaseSearchCommandTests
     public void ParseChannel_WithUnstable_ShouldReturnUnstable()
     {
         // Act
-        NixChannel result = BaseSearchCommand<NixPackage>.ParseChannel("unstable");
+        NixChannel result = BaseSearchCommand<NixPackage>.ParseChannel("unstable", AllChannels);
 
         // Assert
         result.Should().Be(NixChannel.Unstable);
-    }
-
-    /// <summary>
-    /// ParseChannel should throw InvalidOperationException for "stable" without discovery.
-    /// </summary>
-    [Fact]
-    public void ParseChannel_WithStable_ShouldThrowInvalidOperationException()
-    {
-        // Act
-        Action act = () => BaseSearchCommand<NixPackage>.ParseChannel("stable");
-
-        // Assert
-        act.Should().Throw<InvalidOperationException>();
     }
 
     /// <summary>
@@ -167,7 +164,7 @@ public class BaseSearchCommandTests
     public void ParseChannel_WithFlakes_ShouldReturnFlakes()
     {
         // Act
-        NixChannel result = BaseSearchCommand<NixPackage>.ParseChannel("flakes");
+        NixChannel result = BaseSearchCommand<NixPackage>.ParseChannel("flakes", AllChannels);
 
         // Assert
         result.Should().Be(NixChannel.Flakes);
@@ -184,7 +181,7 @@ public class BaseSearchCommandTests
     public void ParseChannel_ShouldBeCaseInsensitive(string channel)
     {
         // Act
-        NixChannel result = BaseSearchCommand<NixPackage>.ParseChannel(channel);
+        NixChannel result = BaseSearchCommand<NixPackage>.ParseChannel(channel, AllChannels);
 
         // Assert
         result.Should().Be(NixChannel.Unstable);
@@ -201,11 +198,44 @@ public class BaseSearchCommandTests
     public void ParseChannel_WithInvalidChannel_ShouldThrowArgumentException(string channel)
     {
         // Act
-        Action act = () => BaseSearchCommand<NixPackage>.ParseChannel(channel);
+        Action act = () => BaseSearchCommand<NixPackage>.ParseChannel(channel, AllChannels);
 
         // Assert
         act.Should().Throw<ArgumentException>()
-            .WithMessage($"Invalid channel '{channel}'. Valid values: unstable, stable, flakes*");
+            .WithMessage($"Invalid channel '{channel}'. Valid values: unstable, stable, beta, flakes*");
+    }
+
+    /// <summary>
+    /// ParseChannel should throw InvalidOperationException for "stable" when no stable channel exists.
+    /// </summary>
+    [Fact]
+    public void ParseChannel_WithStableAndNoStableChannel_ShouldThrowInvalidOperationException()
+    {
+        // Arrange
+        List<NixChannel> channelsWithoutStable =
+        [
+            NixChannel.Unstable,
+            NixChannel.Flakes,
+        ];
+
+        // Act
+        Action act = () => BaseSearchCommand<NixPackage>.ParseChannel("stable", channelsWithoutStable);
+
+        // Assert
+        act.Should().Throw<InvalidOperationException>();
+    }
+
+    /// <summary>
+    /// ParseChannel should resolve "stable" when a stable channel exists.
+    /// </summary>
+    [Fact]
+    public void ParseChannel_WithStable_ShouldResolveFromAvailableChannels()
+    {
+        // Act
+        NixChannel result = BaseSearchCommand<NixPackage>.ParseChannel("stable", AllChannels);
+
+        // Assert
+        result.Value.Should().Be("nixos-24.11");
     }
 
     /// <summary>
@@ -365,14 +395,15 @@ public class BaseSearchCommandTests
 
         /// <inheritdoc/>
         [ExcludeFromCodeCoverage]
-        protected override ISearchResponse<NixPackage> ExecuteSearch(
+        protected override Task<ISearchResponse<NixPackage>> ExecuteSearchAsync(
             ParseResult parseResult,
             INixSearchClient client,
             string query,
             NixChannel channel,
             int from,
             int size,
-            SortOrder? sortOrder)
+            SortOrder? sortOrder,
+            CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

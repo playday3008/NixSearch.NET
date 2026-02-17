@@ -38,6 +38,21 @@ public partial struct NixChannel : IEquatable<NixChannel>
     public readonly bool IsStable => this.Value is not null && StablePattern().IsMatch(this.Value);
 
     /// <summary>
+    /// Gets a value indicating whether this channel is a beta release channel (e.g., nixos-25.11-beta).
+    /// </summary>
+    public readonly bool IsBeta => this.Value is not null && BetaPattern().IsMatch(this.Value);
+
+    /// <summary>
+    /// Gets a value indicating whether this channel is the unstable channel.
+    /// </summary>
+    public readonly bool IsUnstable => string.Equals(this.Value, UnstableValue, StringComparison.Ordinal);
+
+    /// <summary>
+    /// Gets a value indicating whether this channel is the flakes channel.
+    /// </summary>
+    public readonly bool IsFlakes => string.Equals(this.Value, FlakesValue, StringComparison.Ordinal);
+
+    /// <summary>
     /// Equality operator.
     /// </summary>
     /// <param name="left">The left operand.</param>
@@ -67,25 +82,29 @@ public partial struct NixChannel : IEquatable<NixChannel>
 
     /// <summary>
     /// Parses a user-friendly channel name into a NixChannel.
+    /// All named channels are resolved dynamically from available channels.
     /// </summary>
-    /// <param name="channel">The channel name (unstable, stable, flakes).</param>
+    /// <param name="channel">The channel name (unstable, stable, beta, flakes).</param>
     /// <param name="availableChannels">
-    /// Optional list of available channels from discovery, required when resolving "stable".
+    /// List of available channels from discovery, required for resolving all named channels.
     /// </param>
     /// <returns>The corresponding NixChannel.</returns>
     /// <exception cref="ArgumentException">Thrown when the channel name is invalid.</exception>
     /// <exception cref="InvalidOperationException">
-    /// Thrown when "stable" is requested but no available channels are provided or no stable channel is found.
+    /// Thrown when available channels are not provided or the requested channel is not found.
     /// </exception>
-    public static NixChannel Parse(string channel, IReadOnlyList<NixChannel>? availableChannels = null)
+    public static NixChannel Parse(string channel, IReadOnlyList<NixChannel> availableChannels)
     {
+        ArgumentNullException.ThrowIfNull(availableChannels);
+
         return channel.ToLowerInvariant() switch
         {
-            "unstable" => Unstable,
-            "flakes" => Flakes,
-            "stable" => ResolveStable(availableChannels),
+            "unstable" => ResolveByPredicate(availableChannels, c => c.IsUnstable, "unstable"),
+            "flakes" => ResolveByPredicate(availableChannels, c => c.IsFlakes, "flakes"),
+            "stable" => ResolveLatestVersioned(availableChannels, c => c.IsStable, "stable"),
+            "beta" => ResolveLatestVersioned(availableChannels, c => c.IsBeta, "beta"),
             _ => throw new ArgumentException(
-                $"Invalid channel '{channel}'. Valid values: unstable, stable, flakes",
+                $"Invalid channel '{channel}'. Valid values: unstable, stable, beta, flakes",
                 nameof(channel)),
         };
     }
@@ -108,24 +127,42 @@ public partial struct NixChannel : IEquatable<NixChannel>
     [GeneratedRegex(@"^nixos-\d+\.\d+$")]
     private static partial Regex StablePattern();
 
-    private static NixChannel ResolveStable(IReadOnlyList<NixChannel>? availableChannels)
+    [GeneratedRegex(@"^nixos-\d+\.\d+-beta$")]
+    private static partial Regex BetaPattern();
+
+    private static NixChannel ResolveByPredicate(
+        IReadOnlyList<NixChannel> availableChannels,
+        Func<NixChannel, bool> predicate,
+        string channelName)
     {
-        if (availableChannels is null || availableChannels.Count == 0)
+        foreach (NixChannel channel in availableChannels)
         {
-            throw new InvalidOperationException(
-                "Cannot resolve 'stable' channel without available channels. Call GetChannelsAsync() first.");
+            if (predicate(channel))
+            {
+                return channel;
+            }
         }
 
-        NixChannel[] stableChannels = availableChannels
-            .Where(c => c.IsStable)
+        throw new InvalidOperationException(
+            $"No '{channelName}' channel found in available channels.");
+    }
+
+    private static NixChannel ResolveLatestVersioned(
+        IReadOnlyList<NixChannel> availableChannels,
+        Func<NixChannel, bool> predicate,
+        string channelName)
+    {
+        NixChannel[] matching = availableChannels
+            .Where(predicate)
             .OrderByDescending(c => c.Value, StringComparer.Ordinal)
             .ToArray();
 
-        if (stableChannels.Length == 0)
+        if (matching.Length == 0)
         {
-            throw new InvalidOperationException("No stable channel found in available channels.");
+            throw new InvalidOperationException(
+                $"No '{channelName}' channel found in available channels.");
         }
 
-        return stableChannels[0];
+        return matching[0];
     }
 }

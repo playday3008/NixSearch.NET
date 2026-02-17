@@ -33,7 +33,7 @@ public partial class SearchOptionsTool(
     /// Searches for NixOS configuration options.
     /// </summary>
     /// <param name="query">Search query (option name, description keywords, etc.).</param>
-    /// <param name="channel">NixOS channel to search in (unstable, stable, flakes).</param>
+    /// <param name="channel">NixOS channel to search in (unstable, stable, beta, flakes).</param>
     /// <param name="page">Page number (0-indexed).</param>
     /// <param name="size">Number of results per page.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
@@ -43,7 +43,7 @@ public partial class SearchOptionsTool(
     public async Task<SearchResponse<NixOption>> SearchOptions(
         [Description("Search query (option name, description keywords, etc.)")]
         string query,
-        [Description("NixOS channel to search in (unstable, stable, flakes)")]
+        [Description("NixOS channel to search in (unstable, stable, beta, flakes)")]
         string? channel = "unstable",
         [Description("Page number (0-indexed)")]
         int? page = 0,

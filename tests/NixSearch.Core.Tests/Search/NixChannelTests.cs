@@ -16,6 +16,14 @@ namespace NixSearch.Core.Tests.Search;
 /// </summary>
 public class NixChannelTests
 {
+    private static readonly List<NixChannel> AllChannels =
+    [
+        NixChannel.Unstable,
+        NixChannel.FromValue("nixos-24.11"),
+        NixChannel.FromValue("nixos-25.05"),
+        NixChannel.Flakes,
+    ];
+
     /// <summary>
     /// Tests that Unstable returns the correct value.
     /// </summary>
@@ -101,6 +109,7 @@ public class NixChannelTests
     [InlineData("group-manual")]
     [InlineData("nixos-unstable-small")]
     [InlineData("nixpkgs-24.11")]
+    [InlineData("nixos-25.05-beta")]
     public void IsStable_WithNonStablePattern_ShouldReturnFalse(string value)
     {
         // Act
@@ -108,6 +117,97 @@ public class NixChannelTests
 
         // Assert
         channel.IsStable.Should().BeFalse();
+    }
+
+    /// <summary>
+    /// Tests that IsBeta returns true for beta channel patterns.
+    /// </summary>
+    /// <param name="value">The channel value.</param>
+    [Theory]
+    [InlineData("nixos-25.05-beta")]
+    [InlineData("nixos-24.11-beta")]
+    public void IsBeta_WithBetaPattern_ShouldReturnTrue(string value)
+    {
+        // Act
+        NixChannel channel = NixChannel.FromValue(value);
+
+        // Assert
+        channel.IsBeta.Should().BeTrue();
+    }
+
+    /// <summary>
+    /// Tests that IsBeta returns false for non-beta channel patterns.
+    /// </summary>
+    /// <param name="value">The channel value.</param>
+    [Theory]
+    [InlineData("nixos-unstable")]
+    [InlineData("nixos-24.11")]
+    [InlineData("group-manual")]
+    public void IsBeta_WithNonBetaPattern_ShouldReturnFalse(string value)
+    {
+        // Act
+        NixChannel channel = NixChannel.FromValue(value);
+
+        // Assert
+        channel.IsBeta.Should().BeFalse();
+    }
+
+    /// <summary>
+    /// Tests that IsUnstable returns true for the unstable channel.
+    /// </summary>
+    [Fact]
+    public void IsUnstable_WithUnstableChannel_ShouldReturnTrue()
+    {
+        // Act
+        NixChannel channel = NixChannel.Unstable;
+
+        // Assert
+        channel.IsUnstable.Should().BeTrue();
+    }
+
+    /// <summary>
+    /// Tests that IsUnstable returns false for non-unstable channels.
+    /// </summary>
+    /// <param name="value">The channel value.</param>
+    [Theory]
+    [InlineData("nixos-24.11")]
+    [InlineData("group-manual")]
+    public void IsUnstable_WithNonUnstableChannel_ShouldReturnFalse(string value)
+    {
+        // Act
+        NixChannel channel = NixChannel.FromValue(value);
+
+        // Assert
+        channel.IsUnstable.Should().BeFalse();
+    }
+
+    /// <summary>
+    /// Tests that IsFlakes returns true for the flakes channel.
+    /// </summary>
+    [Fact]
+    public void IsFlakes_WithFlakesChannel_ShouldReturnTrue()
+    {
+        // Act
+        NixChannel channel = NixChannel.Flakes;
+
+        // Assert
+        channel.IsFlakes.Should().BeTrue();
+    }
+
+    /// <summary>
+    /// Tests that IsFlakes returns false for non-flakes channels.
+    /// </summary>
+    /// <param name="value">The channel value.</param>
+    [Theory]
+    [InlineData("nixos-unstable")]
+    [InlineData("nixos-24.11")]
+    public void IsFlakes_WithNonFlakesChannel_ShouldReturnFalse(string value)
+    {
+        // Act
+        NixChannel channel = NixChannel.FromValue(value);
+
+        // Assert
+        channel.IsFlakes.Should().BeFalse();
     }
 
     /// <summary>
@@ -167,7 +267,7 @@ public class NixChannelTests
     public void Parse_WithUnstable_ShouldReturnUnstable()
     {
         // Act
-        NixChannel result = NixChannel.Parse("unstable");
+        NixChannel result = NixChannel.Parse("unstable", AllChannels);
 
         // Assert
         result.Should().Be(NixChannel.Unstable);
@@ -180,14 +280,14 @@ public class NixChannelTests
     public void Parse_WithFlakes_ShouldReturnFlakes()
     {
         // Act
-        NixChannel result = NixChannel.Parse("flakes");
+        NixChannel result = NixChannel.Parse("flakes", AllChannels);
 
         // Assert
         result.Should().Be(NixChannel.Flakes);
     }
 
     /// <summary>
-    /// Tests that Parse is case-insensitive.
+    /// Tests that Parse is case-insensitive for unstable.
     /// </summary>
     /// <param name="channel">The channel name.</param>
     [Theory]
@@ -197,7 +297,7 @@ public class NixChannelTests
     public void Parse_WithMixedCaseUnstable_ShouldReturnUnstable(string channel)
     {
         // Act
-        NixChannel result = NixChannel.Parse(channel);
+        NixChannel result = NixChannel.Parse(channel, AllChannels);
 
         // Assert
         result.Should().Be(NixChannel.Unstable);
@@ -214,7 +314,7 @@ public class NixChannelTests
     public void Parse_WithMixedCaseFlakes_ShouldReturnFlakes(string channel)
     {
         // Act
-        NixChannel result = NixChannel.Parse(channel);
+        NixChannel result = NixChannel.Parse(channel, AllChannels);
 
         // Assert
         result.Should().Be(NixChannel.Flakes);
@@ -229,39 +329,65 @@ public class NixChannelTests
     [InlineData("")]
     [InlineData("nixos-23.11")]
     [InlineData("testing")]
-    [InlineData("beta")]
     public void Parse_WithInvalidChannel_ShouldThrowArgumentException(string channel)
     {
         // Act
-        Action act = () => NixChannel.Parse(channel);
+        Action act = () => NixChannel.Parse(channel, AllChannels);
 
         // Assert
         act.Should().Throw<ArgumentException>()
-            .WithMessage($"Invalid channel '{channel}'. Valid values: unstable, stable, flakes*")
+            .WithMessage($"Invalid channel '{channel}'. Valid values: unstable, stable, beta, flakes*")
             .WithParameterName(nameof(channel));
     }
 
     /// <summary>
-    /// Tests that Parse with "stable" without available channels throws InvalidOperationException.
+    /// Tests that Parse with null available channels throws ArgumentNullException.
     /// </summary>
     [Fact]
-    public void Parse_WithStableWithoutChannels_ShouldThrowInvalidOperationException()
+    public void Parse_WithNullAvailableChannels_ShouldThrowArgumentNullException()
     {
         // Act
-        Action act = () => NixChannel.Parse("stable");
+        Action act = () => NixChannel.Parse("unstable", null!);
+
+        // Assert
+        act.Should().Throw<ArgumentNullException>();
+    }
+
+    /// <summary>
+    /// Tests that Parse with "unstable" and no unstable channel throws InvalidOperationException.
+    /// </summary>
+    [Fact]
+    public void Parse_WithUnstableAndNoUnstableChannel_ShouldThrowInvalidOperationException()
+    {
+        // Arrange
+        List<NixChannel> channels =
+        [
+            NixChannel.FromValue("nixos-24.11"),
+            NixChannel.Flakes,
+        ];
+
+        // Act
+        Action act = () => NixChannel.Parse("unstable", channels);
 
         // Assert
         act.Should().Throw<InvalidOperationException>();
     }
 
     /// <summary>
-    /// Tests that Parse with "stable" and empty channels throws InvalidOperationException.
+    /// Tests that Parse with "flakes" and no flakes channel throws InvalidOperationException.
     /// </summary>
     [Fact]
-    public void Parse_WithStableAndEmptyChannels_ShouldThrowInvalidOperationException()
+    public void Parse_WithFlakesAndNoFlakesChannel_ShouldThrowInvalidOperationException()
     {
+        // Arrange
+        List<NixChannel> channels =
+        [
+            NixChannel.Unstable,
+            NixChannel.FromValue("nixos-24.11"),
+        ];
+
         // Act
-        Action act = () => NixChannel.Parse("stable", []);
+        Action act = () => NixChannel.Parse("flakes", channels);
 
         // Assert
         act.Should().Throw<InvalidOperationException>();
@@ -352,5 +478,94 @@ public class NixChannelTests
 
         // Assert
         result.Value.Should().Be("nixos-24.11");
+    }
+
+    /// <summary>
+    /// Tests that Parse with "beta" resolves to the latest beta channel.
+    /// </summary>
+    [Fact]
+    public void Parse_WithBeta_ShouldReturnLatestBeta()
+    {
+        // Arrange
+        List<NixChannel> channels =
+        [
+            NixChannel.Unstable,
+            NixChannel.FromValue("nixos-24.11"),
+            NixChannel.FromValue("nixos-25.05-beta"),
+            NixChannel.FromValue("nixos-25.11-beta"),
+            NixChannel.Flakes,
+        ];
+
+        // Act
+        NixChannel result = NixChannel.Parse("beta", channels);
+
+        // Assert
+        result.Value.Should().Be("nixos-25.11-beta");
+        result.IsBeta.Should().BeTrue();
+    }
+
+    /// <summary>
+    /// Tests that Parse with "beta" selects the highest beta version.
+    /// </summary>
+    [Fact]
+    public void Parse_WithBeta_ShouldSelectHighestVersion()
+    {
+        // Arrange
+        List<NixChannel> channels =
+        [
+            NixChannel.FromValue("nixos-24.11-beta"),
+            NixChannel.FromValue("nixos-25.11-beta"),
+            NixChannel.FromValue("nixos-25.05-beta"),
+        ];
+
+        // Act
+        NixChannel result = NixChannel.Parse("beta", channels);
+
+        // Assert
+        result.Value.Should().Be("nixos-25.11-beta");
+    }
+
+    /// <summary>
+    /// Tests that Parse with "beta" and no beta channels throws InvalidOperationException.
+    /// </summary>
+    [Fact]
+    public void Parse_WithBetaAndNoBetaChannels_ShouldThrowInvalidOperationException()
+    {
+        // Arrange
+        List<NixChannel> channels =
+        [
+            NixChannel.Unstable,
+            NixChannel.FromValue("nixos-24.11"),
+            NixChannel.Flakes,
+        ];
+
+        // Act
+        Action act = () => NixChannel.Parse("beta", channels);
+
+        // Assert
+        act.Should().Throw<InvalidOperationException>();
+    }
+
+    /// <summary>
+    /// Tests that Parse with mixed case "beta" works.
+    /// </summary>
+    /// <param name="channel">The channel name.</param>
+    [Theory]
+    [InlineData("BETA")]
+    [InlineData("Beta")]
+    [InlineData("BeTa")]
+    public void Parse_WithMixedCaseBeta_ShouldResolveBeta(string channel)
+    {
+        // Arrange
+        List<NixChannel> channels =
+        [
+            NixChannel.FromValue("nixos-25.05-beta"),
+        ];
+
+        // Act
+        NixChannel result = NixChannel.Parse(channel, channels);
+
+        // Assert
+        result.Value.Should().Be("nixos-25.05-beta");
     }
 }
