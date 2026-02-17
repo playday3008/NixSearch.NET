@@ -23,7 +23,7 @@ Search for NixOS packages in nixpkgs.
 **Parameters:**
 
 - `query` (required): Search query (package name, description keywords)
-- `channel`: NixOS channel - `unstable`, `stable`, or `flakes` (default: unstable)
+- `channel`: NixOS channel - `unstable`, `stable`, `beta`, or `flakes` (default: unstable)
 - `platform`: Filter by platforms (e.g., `x86_64-linux`, `aarch64-darwin`)
 - `packageSet`: Filter by package sets (e.g., `python3Packages`, `haskellPackages`)
 - `license`: Filter by license names
@@ -41,7 +41,7 @@ Search for NixOS configuration options.
 **Parameters:**
 
 - `query` (required): Search query (option name, description keywords)
-- `channel`: NixOS channel - `unstable`, `stable`, or `flakes` (default: unstable)
+- `channel`: NixOS channel - `unstable`, `stable`, `beta`, or `flakes` (default: unstable)
 - `page`: Page number, 0-indexed (default: 0)
 - `size`: Results per page (default: 50)
 
@@ -53,7 +53,7 @@ Get detailed information about a specific package.
 
 **Parameters:**
 
-- `packageName` (required): Exact package attribute name (e.g., `git`, `python3`)
+- `attrName` (required): Package attribute name (e.g., `firefox`, `python3Packages.numpy`)
 - `channel`: NixOS channel (default: unstable)
 
 **Returns:** Complete package information including metadata, dependencies, and build information.
@@ -179,13 +179,18 @@ curl https://zhyxgxr7amp6usu6o2qdeab6ja0bpybd.lambda-url.eu-central-1.on.aws/inf
 ```json
 {
   "NixSearch": {
-    "ElasticsearchUrl": "https://search.nixos.org/backend",
-    "DefaultChannel": "unstable",
-    "DefaultPageSize": 50
+    "Url": "https://search.nixos.org/backend",
+    "Username": "your-username",
+    "Password": "your-password",
+    "MappingSchemaVersion": 44,
+    "Timeout": "00:00:30",
+    "MaxRetries": 5,
+    "MaxRetryTimeout": "00:02:00",
+    "EnableDebugMode": false
   },
   "MCP": {
     "Stateless": true,
-    "IdleTimeout": "24:00:00"
+    "IdleTimeout": "1.00:00:00"
   }
 }
 ```
@@ -195,8 +200,9 @@ curl https://zhyxgxr7amp6usu6o2qdeab6ja0bpybd.lambda-url.eu-central-1.on.aws/inf
 Configuration can be overridden with environment variables prefixed with `NIXSEARCH_`:
 
 ```bash
-export NIXSEARCH_NixSearch__ElasticsearchUrl="https://search.nixos.org/backend"
-export NIXSEARCH_NixSearch__DefaultChannel="stable"
+export NIXSEARCH_NixSearch__Url="https://search.nixos.org/backend"
+export NIXSEARCH_NixSearch__Username="your-username"
+export NIXSEARCH_NixSearch__Password="your-password"
 export NIXSEARCH_MCP__Stateless="true"
 ```
 

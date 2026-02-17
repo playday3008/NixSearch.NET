@@ -22,57 +22,70 @@ dotnet add package NixSearch.Core
 ### Basic Setup
 
 ```csharp
-using NixSearch.Core;
-using NixSearch.Core.Extensions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using NixSearch.Core.Extensions;
+using NixSearch.Core.Search;
+
 // Configure services
-var services = new ServiceCollection();
-services.AddNixSearchClient();
-var provider = services.BuildServiceProvider();
+IConfiguration configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build()
+    .GetSection("NixSearch");
+
+ServiceCollection services = new ServiceCollection();
+services.AddNixSearch(configuration);
+ServiceProvider provider = services.BuildServiceProvider();
 
 // Get client
-var client = provider.GetRequiredService<INixSearchClient>();
+INixSearchClient client = provider.GetRequiredService<INixSearchClient>();
 ```
 
 ### Searching Packages
 
 ```csharp
+using NixSearch.Core.Models;
+
+// Discover available channels
+IReadOnlyList<NixChannel> channels = await client.GetChannelsAsync();
+
 // Simple package search
-var results = await client.Packages()
+Nest.ISearchResponse<NixPackage> results = await client.Packages()
     .WithQuery("git")
-    .WithSize(10)
+    .Page(0, 10)
     .ExecuteAsync();
 
-foreach (var package in results.Items)
+foreach (NixPackage package in results.Documents)
 {
-    Console.WriteLine($"{package.PackageName} {package.Version}");
+    Console.WriteLine($"{package.Name} {package.Version}");
     Console.WriteLine($"Description: {package.Description}");
 }
 
 // Advanced package search with filters
-var filtered = await client.Packages()
+Nest.ISearchResponse<NixPackage> filtered = await client.Packages()
     .WithQuery("python")
-    .WithChannel(NixChannel.Unstable)
-    .WithPlatforms("x86_64-linux")
-    .WithLicenses("mit")
-    .WithSize(20)
-    .WithFrom(0)
+    .ForChannel(NixChannel.Unstable)
+    .WithPlatform("x86_64-linux")
+    .WithLicense("mit")
+    .Page(0, 20)
     .ExecuteAsync();
 ```
 
 ### Searching Options
 
 ```csharp
+using NixSearch.Core.Models;
+
 // Search NixOS options
-var options = await client.Options()
+Nest.ISearchResponse<NixOption> options = await client.Options()
     .WithQuery("services.nginx")
-    .WithSize(10)
+    .Page(0, 10)
     .ExecuteAsync();
 
-foreach (var option in options.Items)
+foreach (NixOption option in options.Documents)
 {
-    Console.WriteLine($"{option.OptionName}");
+    Console.WriteLine($"{option.Name}");
     Console.WriteLine($"Type: {option.Type}");
     Console.WriteLine($"Description: {option.Description}");
 }
@@ -85,9 +98,14 @@ foreach (var option in options.Items)
 ```json
 {
   "NixSearch": {
-    "ElasticsearchUrl": "https://search.nixos.org/backend",
-    "DefaultChannel": "unstable",
-    "DefaultPageSize": 50
+    "Url": "https://search.nixos.org/backend",
+    "Username": "your-username",
+    "Password": "your-password",
+    "MappingSchemaVersion": 44,
+    "Timeout": "00:00:30",
+    "MaxRetries": 5,
+    "MaxRetryTimeout": "00:02:00",
+    "EnableDebugMode": false
   }
 }
 ```
@@ -95,11 +113,13 @@ foreach (var option in options.Items)
 ### Programmatic Configuration
 
 ```csharp
-services.AddNixSearchClient(options =>
+using NixSearch.Core.Configuration;
+
+services.AddNixSearch(new NixSearchOptions
 {
-    options.ElasticsearchUrl = "https://search.nixos.org/backend";
-    options.DefaultChannel = "unstable";
-    options.DefaultPageSize = 50;
+    Url = "https://search.nixos.org/backend",
+    Username = "your-username",
+    Password = "your-password",
 });
 ```
 
@@ -110,49 +130,49 @@ services.AddNixSearchClient(options =>
 #### Package Search Builder
 
 - `WithQuery(string)` - Set search query
-- `WithSize(int)` - Set page size (default: 50)
-- `WithFrom(int)` - Set pagination offset
-- `WithChannel(NixChannel)` - Filter by channel (stable, unstable)
-- `WithPlatforms(params string[])` - Filter by platforms (e.g., "x86_64-linux")
-- `WithLicenses(params string[])` - Filter by licenses
-- `WithMaintainers(params string[])` - Filter by maintainer names
-- `WithTeams(params string[])` - Filter by team names
-- `WithAttributes(params string[])` - Filter by package attributes
+- `Page(int from, int size)` - Set pagination offset and page size (default: 0, 50)
+- `ForChannel(NixChannel)` - Filter by channel (stable, unstable, beta, flakes)
+- `SortBy(SortOrder?)` - Set sort order
+- `WithPlatform(params string[])` - Filter by platforms (e.g., "x86_64-linux")
+- `WithLicense(params string[])` - Filter by licenses
+- `WithMaintainer(params string[])` - Filter by maintainer names
+- `WithTeam(params string[])` - Filter by team names
+- `WithPackageSet(params string[])` - Filter by package sets (e.g., "python3Packages")
 - `ExecuteAsync()` - Execute the search
 
 #### Option Search Builder
 
 - `WithQuery(string)` - Set search query
-- `WithSize(int)` - Set page size
-- `WithFrom(int)` - Set pagination offset
-- `WithChannel(NixChannel)` - Filter by channel
+- `Page(int from, int size)` - Set pagination offset and page size
+- `ForChannel(NixChannel)` - Filter by channel
+- `SortBy(SortOrder?)` - Set sort order
 - `ExecuteAsync()` - Execute the search
 
 ### Working with Results
 
 ```csharp
-var results = await client.Packages()
+Nest.ISearchResponse<NixPackage> results = await client.Packages()
     .WithQuery("neovim")
     .ExecuteAsync();
 
 // Access metadata
 Console.WriteLine($"Total hits: {results.Total}");
-Console.WriteLine($"Results returned: {results.Items.Count}");
+Console.WriteLine($"Results returned: {results.Documents.Count}");
 
 // Process packages
-foreach (var package in results.Items)
+foreach (NixPackage package in results.Documents)
 {
-    Console.WriteLine($"Package: {package.PackageName}");
+    Console.WriteLine($"Package: {package.Name}");
     Console.WriteLine($"Version: {package.Version}");
     Console.WriteLine($"Description: {package.Description}");
 
-    if (package.License != null)
-        Console.WriteLine($"License: {package.License}");
+    if (package.License.Length > 0)
+        Console.WriteLine($"License: {string.Join(", ", package.License.Select(l => l.FullName))}");
 
-    if (package.Platforms?.Count > 0)
+    if (package.Platforms.Length > 0)
         Console.WriteLine($"Platforms: {string.Join(", ", package.Platforms)}");
 
-    if (package.Maintainers?.Count > 0)
+    if (package.Maintainers.Length > 0)
         Console.WriteLine($"Maintainers: {string.Join(", ", package.Maintainers.Select(m => m.Name))}");
 }
 ```
@@ -160,13 +180,15 @@ foreach (var package in results.Items)
 ### Error Handling
 
 ```csharp
+using NixSearch.Core.Exceptions;
+
 try
 {
-    var results = await client.Packages()
+    Nest.ISearchResponse<NixPackage> results = await client.Packages()
         .WithQuery("package-name")
         .ExecuteAsync();
 }
-catch (ElasticsearchClientException ex)
+catch (NixSearchException ex)
 {
     Console.Error.WriteLine($"Search failed: {ex.Message}");
 }
@@ -178,22 +200,23 @@ catch (ElasticsearchClientException ex)
 
 Core properties:
 
-- `PackageName` - Package attribute name
-- `PackageProgramName` - Program name
+- `AttrName` - Package attribute name (e.g., "git")
+- `Name` - Package name (e.g., "git")
 - `Version` - Package version
 - `Description` - Package description
 - `LongDescription` - Detailed description
-- `License` - License information
-- `Homepage` - Project homepage
-- `Platforms` - Supported platforms
-- `Maintainers` - Package maintainers
+- `MainProgram` - Main program name
+- `License` - License information (`License[]`)
+- `Homepage` - Project homepage URLs (`string[]?`)
+- `Platforms` - Supported platforms (`string[]`)
+- `Maintainers` - Package maintainers (`Maintainer[]`)
 - `Position` - Source location in nixpkgs
 
 ### NixOption
 
 Core properties:
 
-- `OptionName` - Full option path (e.g., "services.nginx.enable")
+- `Name` - Full option path (e.g., "services.nginx.enable")
 - `Description` - Option description
 - `Type` - Option type (e.g., "boolean", "string")
 - `Default` - Default value
@@ -202,17 +225,23 @@ Core properties:
 
 ### NixFlake
 
+`NixFlake` is the abstract base record for both `NixPackage` and `NixOption`.
+
 Core properties:
 
 - `FlakeName` - Flake identifier
-- `Description` - Flake description
-- `Resolved` - Resolved flake information
-- `Packages` - Available packages in the flake
+- `FlakeDescription` - Flake description
+- `FlakeResolved` - Resolved flake repository information (`Repo`)
+- `FlakeRevision` - Flake revision hash
 
 ## Supported Channels
 
-- `NixChannel.Stable` - Latest stable release (e.g., 24.05)
+Channels are resolved dynamically from the backend via `GetChannelsAsync()`:
+
 - `NixChannel.Unstable` - Rolling release (nixos-unstable)
+- `NixChannel.Flakes` - Flakes channel
+- `NixChannel.Parse("stable", channels)` - Latest stable release (dynamically resolved)
+- `NixChannel.Parse("beta", channels)` - Latest beta release (dynamically resolved)
 
 ## Requirements
 

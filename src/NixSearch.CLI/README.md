@@ -8,7 +8,7 @@ A command-line tool for searching NixOS packages and options from your terminal.
 - **Option Discovery**: Search NixOS configuration options
 - **Multiple Output Formats**: Text, JSON, YAML, or XML output
 - **Advanced Filtering**: Filter by platform, license, maintainer, and more
-- **Channel Support**: Search across stable, unstable, or flakes channels
+- **Channel Support**: Search across stable, unstable, beta, or flakes channels
 - **Pagination**: Control result size and offset for large result sets
 
 ## Installation
@@ -71,7 +71,7 @@ nixsearch packages nodejs --size 10 --from 20
 
 #### Options
 
-- `--channel <stable|unstable|flakes>` - Specify the channel (default: unstable)
+- `--channel <stable|unstable|beta|flakes>` - Specify the channel (default: unstable)
 - `--size <number>` - Number of results to return (default: 50)
 - `--from <number>` - Offset for pagination (default: 0)
 - `--format <text|json|yaml|xml>` - Output format (default: text)
@@ -124,7 +124,7 @@ nixsearch options networking --size 20
 
 #### Options
 
-- `--channel <stable|unstable|flakes>` - Specify the channel (default: unstable)
+- `--channel <stable|unstable|beta|flakes>` - Specify the channel (default: unstable)
 - `--size <number>` - Number of results to return (default: 50)
 - `--from <number>` - Offset for pagination (default: 0)
 - `--format <text|json|yaml|xml>` - Output format (default: text)
@@ -158,7 +158,7 @@ nixsearch packages git
 Structured JSON for programmatic use.
 
 ```bash
-nixsearch packages git --format json | jq '.items[0].packageName'
+nixsearch packages git --format json | jq '.results[0].name'
 ```
 
 ### YAML
@@ -184,9 +184,14 @@ The CLI tool reads configuration from `appsettings.json` in the application dire
 ```json
 {
   "NixSearch": {
-    "ElasticsearchUrl": "https://search.nixos.org/backend",
-    "DefaultChannel": "unstable",
-    "DefaultPageSize": 50
+    "Url": "https://search.nixos.org/backend",
+    "Username": "your-username",
+    "Password": "your-password",
+    "MappingSchemaVersion": 44,
+    "Timeout": "00:00:30",
+    "MaxRetries": 5,
+    "MaxRetryTimeout": "00:02:00",
+    "EnableDebugMode": false
   }
 }
 ```
@@ -194,9 +199,9 @@ The CLI tool reads configuration from `appsettings.json` in the application dire
 You can also configure via environment variables:
 
 ```bash
-export NixSearch__ElasticsearchUrl="https://search.nixos.org/backend"
-export NixSearch__DefaultChannel="stable"
-export NixSearch__DefaultPageSize=100
+export NixSearch__Url="https://search.nixos.org/backend"
+export NixSearch__Username="your-username"
+export NixSearch__Password="your-password"
 ```
 
 ## Scripting Examples
@@ -209,7 +214,7 @@ nixsearch packages python \
   --package-set python3Packages \
   --format json \
   --size 1000 \
-  | jq -r '.items[].packageName'
+  | jq -r '.results[].name'
 ```
 
 ### Check Package Availability
@@ -232,7 +237,7 @@ nixsearch packages "" \
   --maintainer "Your Name" \
   --format json \
   --size 100 \
-  | jq -r '.items[].packageName'
+  | jq -r '.results[].name'
 ```
 
 ## Tips
@@ -264,7 +269,7 @@ nixsearch packages "" \
 5. **JSON Processing**: Pipe JSON output to `jq` for filtering:
 
    ```bash
-   nixsearch packages rust --format json | jq '.items[].version'
+   nixsearch packages rust --format json | jq '.results[].version'
    ```
 
 ## Requirements

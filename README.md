@@ -48,19 +48,34 @@ dotnet add package NixSearch.Core
 ```
 
 ```csharp
-using NixSearch.Core;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-var services = new ServiceCollection();
-services.AddNixSearchClient();
-var provider = services.BuildServiceProvider();
+using NixSearch.Core.Extensions;
+using NixSearch.Core.Models;
+using NixSearch.Core.Search;
 
-var client = provider.GetRequiredService<INixSearchClient>();
-var results = await client.SearchPackagesAsync("git", pageSize: 10);
+IConfiguration configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build()
+    .GetSection("NixSearch");
 
-foreach (var package in results.Items)
+ServiceCollection services = new ServiceCollection();
+services.AddNixSearch(configuration);
+ServiceProvider provider = services.BuildServiceProvider();
+
+INixSearchClient client = provider.GetRequiredService<INixSearchClient>();
+IReadOnlyList<NixChannel> channels = await client.GetChannelsAsync();
+
+Nest.ISearchResponse<NixPackage> results = await client.Packages()
+    .WithQuery("git")
+    .ForChannel(NixChannel.Parse("unstable", channels))
+    .Page(0, 10)
+    .ExecuteAsync();
+
+foreach (NixPackage package in results.Documents)
 {
-    Console.WriteLine($"{package.PackageName}: {package.Version}");
+    Console.WriteLine($"{package.Name}: {package.Version}");
 }
 ```
 
