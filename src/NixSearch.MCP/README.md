@@ -78,7 +78,7 @@ The server is designed for AWS Lambda deployment with ARM64 architecture.
 #### Prerequisites
 
 - AWS CLI configured with appropriate credentials
-- .NET 9.0 SDK
+- .NET 10 SDK
 
 #### Deploy via GitHub Actions
 
@@ -284,7 +284,7 @@ dotnet tool install -g Amazon.Lambda.Tools
 
 ## Requirements
 
-- .NET 9.0 or later
+- .NET 10 or later
 - For AWS deployment: AWS account with Lambda and IAM permissions
 
 ## See Also

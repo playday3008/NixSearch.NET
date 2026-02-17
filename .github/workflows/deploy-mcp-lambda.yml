@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: '9.0.x'
+  DOTNET_VERSION: '10.0.x'
   AWS_REGION: eu-central-1
   FUNCTION_NAME: NixSearchMCP
 
@@ -42,16 +42,11 @@ jobs:
         run: |
           dotnet publish src/NixSearch.MCP/NixSearch.MCP.csproj \
             --configuration Release \
-            --runtime linux-arm64 \
-            --self-contained \
-            --output publish \
-            /p:PublishReadyToRun=false
+            --output publish
 
       - name: Prepare Lambda package
         run: |
           cd publish
-          mv NixSearch.MCP bootstrap
-          chmod +x bootstrap
           zip -r ../nixsearch-mcp-lambda.zip .
           cd ..
           ls -lh nixsearch-mcp-lambda.zip
@@ -73,10 +68,12 @@ jobs:
           aws lambda wait function-updated \
             --function-name ${{ env.FUNCTION_NAME }}
 
-      - name: Update environment variables
+      - name: Update function configuration
         run: |
           aws lambda update-function-configuration \
             --function-name ${{ env.FUNCTION_NAME }} \
+            --runtime dotnet10 \
+            --handler NixSearch.MCP \
             --environment "Variables={
               NIXSEARCH__Url=${{ secrets.NIXSEARCH_URL }},
               NIXSEARCH__Username=${{ secrets.NIXSEARCH_USERNAME }},

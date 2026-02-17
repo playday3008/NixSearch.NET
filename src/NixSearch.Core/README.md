@@ -216,7 +216,7 @@ Core properties:
 
 ## Requirements
 
-- .NET 9.0 or later
+- .NET 10 or later
 - Internet connection to access search.nixos.org
 
 ## Architecture

@@ -3,7 +3,7 @@
 A comprehensive .NET solution for searching and exploring NixOS packages, options, and flakes using the search.nixos.org Elasticsearch backend.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com/)
 
 ## Overview
 
@@ -20,7 +20,7 @@ NixSearch.NET provides multiple ways to interact with the NixOS package and opti
 The core library providing search functionality for NixOS packages, options, and flakes.
 
 - **NuGet Package**: `NixSearch.Core`
-- **Target Framework**: .NET 9.0
+- **Target Framework**: .NET 10
 - **Features**: Full Elasticsearch query support, strongly-typed models, async/await patterns
 
 ### [NixSearch.CLI](src/NixSearch.CLI/README.md)
@@ -96,7 +96,7 @@ dotnet pack
 
 ## Requirements
 
-- .NET 9.0 SDK or later
+- .NET 10 SDK or later
 - For AWS Lambda deployment: AWS CLI configured
 
 ## Repository Structure

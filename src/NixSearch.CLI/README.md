@@ -269,7 +269,7 @@ nixsearch packages "" \
 
 ## Requirements
 
-- .NET 9.0 runtime or later
+- .NET 10 runtime or later
 - Internet connection to access search.nixos.org
 
 ## See Also
