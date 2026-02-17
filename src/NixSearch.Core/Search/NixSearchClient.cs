@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
 
@@ -18,6 +22,7 @@ public sealed class NixSearchClient : INixSearchClient
 {
     private readonly IElasticClient client;
     private readonly IOptions<NixSearchOptions> options;
+    private IReadOnlyList<NixChannel>? cachedChannels;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NixSearchClient"/> class.
@@ -43,8 +48,34 @@ public sealed class NixSearchClient : INixSearchClient
     }
 
     /// <inheritdoc/>
-    public OptionSearchBuilderBase Options()
+    public OptionSearchBuilder Options()
     {
         return new OptionSearchBuilder(this.client, this.options);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<NixChannel>> GetChannelsAsync(CancellationToken cancellationToken = default)
+    {
+        if (this.cachedChannels is not null)
+        {
+            return this.cachedChannels;
+        }
+
+        int schemaVersion = this.options.Value.MappingSchemaVersion;
+        string aliasPrefix = $"latest-{schemaVersion}-";
+
+        CatResponse<CatAliasesRecord> catResponse = await this.client.Cat.AliasesAsync(
+            c => c.Name($"{aliasPrefix}*"),
+            cancellationToken);
+
+        List<NixChannel> channels = catResponse.Records
+            .Select(r => r.Alias)
+            .Where(a => a.StartsWith(aliasPrefix, StringComparison.Ordinal))
+            .Select(a => NixChannel.FromValue(a.Substring(aliasPrefix.Length)))
+            .Distinct()
+            .ToList();
+
+        this.cachedChannels = channels.AsReadOnly();
+        return this.cachedChannels;
     }
 }

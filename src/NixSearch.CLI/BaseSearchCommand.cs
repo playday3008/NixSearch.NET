@@ -18,19 +18,13 @@ public abstract class BaseSearchCommand<T>
     where T : class
 {
     /// <summary>
-    /// Parses the channel string into a NixChannel enum.
+    /// Parses the channel string into a NixChannel.
     /// </summary>
     /// <param name="channel">The channel string to parse.</param>
     /// <returns>The parsed NixChannel.</returns>
     internal static NixChannel ParseChannel(string channel)
     {
-        return channel.ToLowerInvariant() switch
-        {
-            "unstable" => NixChannel.Unstable,
-            "stable" => NixChannel.Stable,
-            "flakes" => NixChannel.Flakes,
-            _ => throw new ArgumentException($"Invalid channel: {channel}. Valid values are: unstable, stable, flakes"),
-        };
+        return NixChannel.Parse(channel);
     }
 
     /// <summary>

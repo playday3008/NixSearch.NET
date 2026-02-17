@@ -50,7 +50,7 @@ public class OptionSearchBuilderTests
 
         // Assert
         builder.Should().NotBeNull();
-        builder.Should().BeAssignableTo<OptionSearchBuilderBase>();
+        builder.Should().BeAssignableTo<OptionSearchBuilder>();
     }
 
     /// <summary>
@@ -171,9 +171,9 @@ public class OptionSearchBuilderTests
         OptionSearchBuilder builder = new(this.mockClient.Object, this.options);
 
         // Act
-        OptionSearchBuilderBase result = builder
+        OptionSearchBuilder result = builder
             .WithQuery("boot")
-            .ForChannel(NixChannel.Stable)
+            .ForChannel(NixChannel.FromValue("nixos-24.11"))
             .Page(0, 100)
             .SortBy(Nest.SortOrder.Descending);
 
@@ -271,7 +271,7 @@ public class OptionSearchBuilderTests
         // Act
         await builder
             .WithQuery("test")
-            .ForChannel(NixChannel.Stable)
+            .ForChannel(NixChannel.FromValue("nixos-24.11"))
             .ExecuteAsync(TestContext.Current.CancellationToken);
 
         // Assert

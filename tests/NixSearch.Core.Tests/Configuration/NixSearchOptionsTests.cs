@@ -36,23 +36,21 @@ public class NixSearchOptionsTests
     }
 
     /// <summary>
-    /// Tests that the Url property is settable.
+    /// Tests that all properties are initializable.
     /// </summary>
     [Fact]
-    public void Everything_ShouldBeSettable()
+    public void Everything_ShouldBeInitializable()
     {
-        // Arrange
+        // Act
         NixSearchOptions options = new()
         {
+            Url = "https://custom.url/backend",
             Username = "test",
             Password = "test",
+            MappingSchemaVersion = 45,
+            Timeout = TimeSpan.FromSeconds(60),
+            EnableDebugMode = true,
         };
-
-        // Act
-        options.Url = "https://custom.url/backend";
-        options.MappingSchemaVersion = 45;
-        options.Timeout = TimeSpan.FromSeconds(60);
-        options.EnableDebugMode = true;
 
         // Assert
         options.Url.Should().Be("https://custom.url/backend");

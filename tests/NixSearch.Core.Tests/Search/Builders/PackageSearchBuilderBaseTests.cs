@@ -237,7 +237,7 @@ public class PackageSearchBuilderBaseTests
         // Act
         PackageSearchBuilderBase result = builder
             .WithQuery("vim")
-            .ForChannel(NixChannel.Stable)
+            .ForChannel(NixChannel.FromValue("nixos-24.11"))
             .WithPackageSet("vimPlugins")
             .WithLicense("mit")
             .WithMaintainer("alice")

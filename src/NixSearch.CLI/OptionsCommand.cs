@@ -34,7 +34,7 @@ public class OptionsCommand : BaseSearchCommand<NixOption>
         int size,
         SortOrder? sortOrder)
     {
-        OptionSearchBuilderBase builder = client.Options()
+        OptionSearchBuilder builder = client.Options()
             .WithQuery(query)
             .ForChannel(channel)
             .Page(from, size)

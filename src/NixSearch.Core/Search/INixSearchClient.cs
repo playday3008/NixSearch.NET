@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: MIT
 
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
 using NixSearch.Core.Search.Builders;
 
 namespace NixSearch.Core.Search;
@@ -19,5 +23,12 @@ public interface INixSearchClient
     /// Creates an option search builder.
     /// </summary>
     /// <returns>An option search builder instance.</returns>
-    OptionSearchBuilderBase Options();
+    OptionSearchBuilder Options();
+
+    /// <summary>
+    /// Gets the available NixOS channels by querying Elasticsearch indices.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A read-only list of available channels.</returns>
+    Task<IReadOnlyList<NixChannel>> GetChannelsAsync(CancellationToken cancellationToken = default);
 }

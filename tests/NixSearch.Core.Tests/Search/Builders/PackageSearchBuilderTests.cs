@@ -214,7 +214,7 @@ public class PackageSearchBuilderTests
         // Act
         PackageSearchBuilderBase result = builder
             .WithQuery("python")
-            .ForChannel(NixChannel.Stable)
+            .ForChannel(NixChannel.FromValue("nixos-24.11"))
             .WithPackageSet("python3Packages")
             .WithLicense("mit", "gpl3")
             .WithMaintainer("alice", "bob")

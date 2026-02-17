@@ -148,16 +148,16 @@ public class BaseSearchCommandTests
     }
 
     /// <summary>
-    /// ParseChannel should parse "stable" to NixChannel.Stable.
+    /// ParseChannel should throw InvalidOperationException for "stable" without discovery.
     /// </summary>
     [Fact]
-    public void ParseChannel_WithStable_ShouldReturnStable()
+    public void ParseChannel_WithStable_ShouldThrowInvalidOperationException()
     {
         // Act
-        NixChannel result = BaseSearchCommand<NixPackage>.ParseChannel("stable");
+        Action act = () => BaseSearchCommand<NixPackage>.ParseChannel("stable");
 
         // Assert
-        result.Should().Be(NixChannel.Stable);
+        act.Should().Throw<InvalidOperationException>();
     }
 
     /// <summary>
@@ -205,7 +205,7 @@ public class BaseSearchCommandTests
 
         // Assert
         act.Should().Throw<ArgumentException>()
-            .WithMessage($"Invalid channel: {channel}*");
+            .WithMessage($"Invalid channel '{channel}'. Valid values: unstable, stable, flakes*");
     }
 
     /// <summary>

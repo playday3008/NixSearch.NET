@@ -27,6 +27,9 @@ internal sealed class PackageSearchBuilder(
         client,
         options)
 {
+    private const string TypeValue = "package";
+    private const string FilterName = "filter_packages";
+
     // Aggregation size is taken from official Nixpkgs search frontend
     private new const int AggregationSize = 20;
 
@@ -133,9 +136,9 @@ internal sealed class PackageSearchBuilder(
                     .Filter(
                         f => f
                             .Term(t => t
-                                .Field("type")
-                                .Name("filter_packages")
-                                .Value("package")),
+                                .Field(TypeField)
+                                .Name(FilterName)
+                                .Value(TypeValue)),
                         f => f
                             .Bool(bb => bb
                                 .Must(

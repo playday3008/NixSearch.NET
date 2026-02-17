@@ -27,6 +27,11 @@ public abstract class SearchBuilderBase<TSource, TBuilder>
     where TSource : class
 {
     /// <summary>
+    /// The Elasticsearch type field name.
+    /// </summary>
+    protected const string TypeField = "type";
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="SearchBuilderBase{TSource, TBuilder}"/> class.
     /// </summary>
     /// <param name="client">The Elasticsearch client.</param>

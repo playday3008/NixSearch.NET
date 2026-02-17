@@ -329,7 +329,7 @@ public class SearchBuilderBaseTests
 
         TestSearchBuilder builder = new(this.mockClient.Object, this.options);
         builder.WithQuery("python")
-               .ForChannel(NixChannel.Stable)
+               .ForChannel(NixChannel.FromValue("nixos-24.11"))
                .Page(10, 20)
                .SortBy(SortOrder.Ascending);
 
@@ -391,7 +391,7 @@ public class SearchBuilderBaseTests
 
         TestSearchBuilder builder = new(this.mockClient.Object, this.options);
         builder.WithQuery("python")
-               .ForChannel(NixChannel.Stable)
+               .ForChannel(NixChannel.FromValue("nixos-24.11"))
                .Page(10, 20)
                .SortBy(SortOrder.Ascending);
 

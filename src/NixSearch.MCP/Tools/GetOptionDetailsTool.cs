@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
@@ -13,7 +14,6 @@ using ModelContextProtocol.Server;
 using NixSearch.Core.Models;
 using NixSearch.Core.Search;
 using NixSearch.Core.Search.Builders;
-using NixSearch.MCP.Helpers;
 
 namespace NixSearch.MCP.Tools;
 
@@ -45,12 +45,13 @@ public partial class GetOptionDetailsTool(
     {
         this.LogGettingOptionDetails(optionName, channel);
 
-        NixChannel nixChannel = ChannelParser.Parse(channel ?? "unstable");
+        IReadOnlyList<NixChannel> availableChannels = await client.GetChannelsAsync(cancellationToken);
+        NixChannel nixChannel = NixChannel.Parse(channel ?? "unstable", availableChannels);
 
-        OptionSearchBuilderBase builder = client.Options()
+        OptionSearchBuilder builder = client.Options()
             .WithQuery(optionName)
             .ForChannel(nixChannel)
-            .Page(0, 10);
+            .Page(0, 50);
 
         Nest.ISearchResponse<NixOption> searchResponse = await builder.ExecuteAsync(cancellationToken);
 

@@ -102,7 +102,7 @@ public class NixSearchClientTests
         NixSearchClient client = new(this.mockClient.Object, this.options);
 
         // Act
-        OptionSearchBuilderBase result = client.Options();
+        OptionSearchBuilder result = client.Options();
 
         // Assert
         result.Should().NotBeNull();

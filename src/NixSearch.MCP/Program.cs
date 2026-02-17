@@ -60,7 +60,8 @@ string[] tools = [
     "get_option_details",
 ];
 
-// Add CORS for development
+// CORS is required by the MCP protocol specification for browser-based transports (SSE, streamable HTTP).
+// Permissive CORS is intentional: this is a read-only public search API deployed behind Lambda.
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>

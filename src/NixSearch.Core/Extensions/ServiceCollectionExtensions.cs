@@ -49,27 +49,27 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds NixSearch services to the service collection with configuration action.
+    /// Adds NixSearch services to the service collection with explicit options.
     /// </summary>
     /// <param name="services">The service collection.</param>
-    /// <param name="configureOptions">Action to configure options.</param>
+    /// <param name="options">The NixSearch options.</param>
     /// <returns>The service collection for chaining.</returns>
-    /// <exception cref="ArgumentNullException">Thrown if services or configureOptions is null.</exception>
+    /// <exception cref="ArgumentNullException">Thrown if services or options is null.</exception>
     public static IServiceCollection AddNixSearch(
         this IServiceCollection services,
-        in Action<NixSearchOptions> configureOptions)
+        in NixSearchOptions options)
     {
         ArgumentNullException.ThrowIfNull(services);
-        ArgumentNullException.ThrowIfNull(configureOptions);
+        ArgumentNullException.ThrowIfNull(options);
 
-        // Configure options
-        services.Configure(configureOptions);
+        // Register options
+        services.AddSingleton(Options.Create(options));
 
         // Register Elasticsearch client
         services.AddSingleton<IElasticClient>(sp =>
         {
-            NixSearchOptions options = sp.GetRequiredService<IOptions<NixSearchOptions>>().Value;
-            return CreateElasticClient(options);
+            NixSearchOptions opts = sp.GetRequiredService<IOptions<NixSearchOptions>>().Value;
+            return CreateElasticClient(opts);
         });
 
         // Register NixSearch client

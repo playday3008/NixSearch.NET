@@ -6,6 +6,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using NixSearch.Core.Configuration;
 using NixSearch.Core.Extensions;
 using NixSearch.Core.Search;
 
@@ -50,14 +51,14 @@ public static class NixSearchClientFactory
         if (!nixSearchSection.Exists())
         {
             // Use default configuration with empty credentials
-            services.AddNixSearch(options =>
+            services.AddNixSearch(new NixSearchOptions
             {
-                options.Url = "https://search.nixos.org/backend";
-                options.Username = string.Empty;
-                options.Password = string.Empty;
-                options.MappingSchemaVersion = 44;
-                options.Timeout = TimeSpan.FromSeconds(30);
-                options.EnableDebugMode = false;
+                Url = "https://search.nixos.org/backend",
+                Username = string.Empty,
+                Password = string.Empty,
+                MappingSchemaVersion = 44,
+                Timeout = TimeSpan.FromSeconds(30),
+                EnableDebugMode = false,
             });
         }
         else

@@ -108,10 +108,10 @@ public class ServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that AddNixSearch with configure action registers the necessary services.
+    /// Tests that AddNixSearch with explicit options registers the necessary services.
     /// </summary>
     [Fact]
-    public void AddNixSearch_WithConfigureAction_ShouldRegisterServices()
+    public void AddNixSearch_WithExplicitOptions_ShouldRegisterServices()
     {
         // Arrange
         ServiceCollection services = new();
@@ -126,15 +126,7 @@ public class ServiceCollectionExtensionsTests
         };
 
         // Act
-        services.AddNixSearch(options =>
-        {
-            options.Url = opts.Url;
-            options.Username = opts.Username;
-            options.Password = opts.Password;
-            options.MappingSchemaVersion = opts.MappingSchemaVersion;
-            options.Timeout = opts.Timeout;
-            options.EnableDebugMode = opts.EnableDebugMode;
-        });
+        services.AddNixSearch(opts);
         ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Assert
@@ -154,34 +146,34 @@ public class ServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that AddNixSearch with null configure action throws ArgumentNullException.
+    /// Tests that AddNixSearch with null options throws ArgumentNullException.
     /// </summary>
     [Fact]
-    public void AddNixSearch_WithNullConfigureAction_ShouldThrowArgumentNullException()
+    public void AddNixSearch_WithNullOptions_ShouldThrowArgumentNullException()
     {
         // Arrange
         ServiceCollection services = new();
 
         // Act
-        Action act = () => services.AddNixSearch((Action<NixSearchOptions>)null!);
+        Action act = () => services.AddNixSearch((NixSearchOptions)null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
-            .WithParameterName("configureOptions");
+            .WithParameterName("options");
     }
 
     /// <summary>
-    /// Tests that AddNixSearch with null services and configure action throws ArgumentNullException.
+    /// Tests that AddNixSearch with null services and explicit options throws ArgumentNullException.
     /// </summary>
     [Fact]
-    public void AddNixSearch_WithConfigureActionNullServices_ShouldThrowArgumentNullException()
+    public void AddNixSearch_WithExplicitOptionsNullServices_ShouldThrowArgumentNullException()
     {
         // Act
-        Action act = () => ((IServiceCollection)null!).AddNixSearch(options =>
+        Action act = () => ((IServiceCollection)null!).AddNixSearch(new NixSearchOptions
         {
-            options.Url = "https://test.url";
-            options.Username = "test";
-            options.Password = "test";
+            Url = "https://test.url",
+            Username = "test",
+            Password = "test",
         });
 
         // Assert
@@ -197,11 +189,11 @@ public class ServiceCollectionExtensionsTests
     {
         // Arrange
         ServiceCollection services = new();
-        services.AddNixSearch(options =>
+        services.AddNixSearch(new NixSearchOptions
         {
-            options.Url = "https://search.nixos.org/backend";
-            options.Username = "test";
-            options.Password = "test";
+            Url = "https://search.nixos.org/backend",
+            Username = "test",
+            Password = "test",
         });
         ServiceProvider serviceProvider = services.BuildServiceProvider();
 
@@ -221,11 +213,11 @@ public class ServiceCollectionExtensionsTests
     {
         // Arrange
         ServiceCollection services = new();
-        services.AddNixSearch(options =>
+        services.AddNixSearch(new NixSearchOptions
         {
-            options.Url = "https://search.nixos.org/backend";
-            options.Username = "test";
-            options.Password = "test";
+            Url = "https://search.nixos.org/backend",
+            Username = "test",
+            Password = "test",
         });
         ServiceProvider serviceProvider = services.BuildServiceProvider();
 
@@ -245,11 +237,11 @@ public class ServiceCollectionExtensionsTests
     {
         // Arrange
         ServiceCollection services = new();
-        services.AddNixSearch(options =>
+        services.AddNixSearch(new NixSearchOptions
         {
-            options.Url = "https://search.nixos.org/backend";
-            options.Username = "testuser";
-            options.Password = "testpass";
+            Url = "https://search.nixos.org/backend",
+            Username = "testuser",
+            Password = "testpass",
         });
         ServiceProvider serviceProvider = services.BuildServiceProvider();
 
@@ -268,11 +260,11 @@ public class ServiceCollectionExtensionsTests
     {
         // Arrange
         ServiceCollection services = new();
-        services.AddNixSearch(options =>
+        services.AddNixSearch(new NixSearchOptions
         {
-            options.Url = "https://search.nixos.org/backend";
-            options.Username = string.Empty;
-            options.Password = string.Empty;
+            Url = "https://search.nixos.org/backend",
+            Username = string.Empty,
+            Password = string.Empty,
         });
         ServiceProvider serviceProvider = services.BuildServiceProvider();
 
@@ -291,12 +283,12 @@ public class ServiceCollectionExtensionsTests
     {
         // Arrange
         ServiceCollection services = new();
-        services.AddNixSearch(options =>
+        services.AddNixSearch(new NixSearchOptions
         {
-            options.Url = "https://search.nixos.org/backend";
-            options.Username = "test";
-            options.Password = "test";
-            options.EnableDebugMode = true;
+            Url = "https://search.nixos.org/backend",
+            Username = "test",
+            Password = "test",
+            EnableDebugMode = true,
         });
         ServiceProvider serviceProvider = services.BuildServiceProvider();
 

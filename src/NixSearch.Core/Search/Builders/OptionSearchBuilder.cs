@@ -17,13 +17,16 @@ namespace NixSearch.Core.Search.Builders;
 /// </remarks>
 /// <param name="client">The Elasticsearch client.</param>
 /// <param name="options">The NixSearch options.</param>
-internal sealed class OptionSearchBuilder(
+public sealed class OptionSearchBuilder(
     IElasticClient client,
     IOptions<NixSearchOptions> options)
-    : OptionSearchBuilderBase(
+    : SearchBuilderBase<NixOption, OptionSearchBuilder>(
         client,
         options)
 {
+    private const string TypeValue = "option";
+    private const string FilterName = "filter_options";
+
     /// <inheritdoc/>
     protected override string[] GetMatchFields()
     {
@@ -74,9 +77,9 @@ internal sealed class OptionSearchBuilder(
                 .Bool(b => b
                     .Filter(f => f
                         .Term(t => t
-                            .Field("type")
-                            .Name("filter_options")
-                            .Value("option")))
+                            .Field(TypeField)
+                            .Name(FilterName)
+                            .Value(TypeValue)))
                     .Must(m => m
                         .DisMax(dm => dm
                             .TieBreaker(0.7)

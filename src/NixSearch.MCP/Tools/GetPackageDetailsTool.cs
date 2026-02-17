@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
@@ -13,7 +14,6 @@ using ModelContextProtocol.Server;
 using NixSearch.Core.Models;
 using NixSearch.Core.Search;
 using NixSearch.Core.Search.Builders;
-using NixSearch.MCP.Helpers;
 
 namespace NixSearch.MCP.Tools;
 
@@ -48,12 +48,13 @@ public partial class GetPackageDetailsTool(
     {
         this.LogGettingPackageDetails(attrName, channel);
 
-        NixChannel nixChannel = ChannelParser.Parse(channel ?? "unstable");
+        IReadOnlyList<NixChannel> availableChannels = await client.GetChannelsAsync(cancellationToken);
+        NixChannel nixChannel = NixChannel.Parse(channel ?? "unstable", availableChannels);
 
         PackageSearchBuilderBase builder = client.Packages()
             .WithQuery(attrName)
             .ForChannel(nixChannel)
-            .Page(0, 10);
+            .Page(0, 50);
 
         Nest.ISearchResponse<NixPackage> searchResponse = await builder.ExecuteAsync(cancellationToken);
 

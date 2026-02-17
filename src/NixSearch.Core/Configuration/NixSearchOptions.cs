@@ -10,42 +10,42 @@ namespace NixSearch.Core.Configuration;
 public record NixSearchOptions
 {
     /// <summary>
-    /// Gets or sets the Elasticsearch backend URL.
+    /// Gets the Elasticsearch backend URL.
     /// </summary>
-    public string Url { get; set; } = "https://search.nixos.org/backend";
+    public string Url { get; init; } = "https://search.nixos.org/backend";
 
     /// <summary>
-    /// Gets or sets the username for basic authentication.
+    /// Gets the username for basic authentication.
     /// </summary>
-    public required string Username { get; set; }
+    public required string Username { get; init; }
 
     /// <summary>
-    /// Gets or sets the password for basic authentication.
+    /// Gets the password for basic authentication.
     /// </summary>
-    public required string Password { get; set; }
+    public required string Password { get; init; }
 
     /// <summary>
-    /// Gets or sets the Elasticsearch mapping schema version.
+    /// Gets the Elasticsearch mapping schema version.
     /// </summary>
-    public int MappingSchemaVersion { get; set; } = 44;
+    public int MappingSchemaVersion { get; init; } = 44;
 
     /// <summary>
-    /// Gets or sets the request timeout.
+    /// Gets the request timeout.
     /// </summary>
-    public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(30);
+    public TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(30);
 
     /// <summary>
-    /// Gets or sets the maximum number of retries for failed requests.
+    /// Gets the maximum number of retries for failed requests.
     /// </summary>
-    public int MaxRetries { get; set; } = 5;
+    public int MaxRetries { get; init; } = 5;
 
     /// <summary>
-    /// Gets or sets the maximum total time to spend on retries.
+    /// Gets the maximum total time to spend on retries.
     /// </summary>
-    public TimeSpan MaxRetryTimeout { get; set; } = TimeSpan.FromMinutes(2);
+    public TimeSpan MaxRetryTimeout { get; init; } = TimeSpan.FromMinutes(2);
 
     /// <summary>
-    /// Gets or sets a value indicating whether to enable debugging.
+    /// Gets a value indicating whether to enable debugging.
     /// </summary>
-    public bool EnableDebugMode { get; set; }
+    public bool EnableDebugMode { get; init; }
 }
