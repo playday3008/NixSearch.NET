@@ -11,6 +11,7 @@ using ModelContextProtocol.Server;
 using NixSearch.Core.Models;
 using NixSearch.Core.Search;
 using NixSearch.Core.Search.Builders;
+using NixSearch.MCP.Logging;
 using NixSearch.MCP.Models;
 
 namespace NixSearch.MCP.Tools;
@@ -69,31 +70,31 @@ public partial class SearchPackagesTool(
 
         if (platform?.Length > 0)
         {
-            this.LogFilteringBy("platforms", string.Join(", ", platform));
+            this.LogFilteringBy("platforms", platform);
             builder.WithPlatform(platform);
         }
 
         if (packageSet?.Length > 0)
         {
-            this.LogFilteringBy("package", string.Join(", ", packageSet));
+            this.LogFilteringBy("package", packageSet);
             builder.WithPackageSet(packageSet);
         }
 
         if (license?.Length > 0)
         {
-            this.LogFilteringBy("licenses", string.Join(", ", license));
+            this.LogFilteringBy("licenses", license);
             builder.WithLicense(license);
         }
 
         if (maintainer?.Length > 0)
         {
-            this.LogFilteringBy("maintainers", string.Join(", ", maintainer));
+            this.LogFilteringBy("maintainers", maintainer);
             builder.WithMaintainer(maintainer);
         }
 
         if (team?.Length > 0)
         {
-            this.LogFilteringBy("teams", string.Join(", ", team));
+            this.LogFilteringBy("teams", team);
             builder.WithTeam(team);
         }
 
@@ -128,6 +129,6 @@ public partial class SearchPackagesTool(
 
     [LoggerMessage(
         Level = LogLevel.Debug,
-        Message = "Filtering by {what}: {values}")]
-    private partial void LogFilteringBy(string what, string values);
+        Message = "Filtering by {What}: {Values}")]
+    private partial void LogFilteringBy(string what, CommaSeparatedValues values);
 }

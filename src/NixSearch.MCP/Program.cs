@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using NixSearch.Core.Extensions;
+using NixSearch.MCP.Logging;
 using NixSearch.MCP.Tools;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -100,7 +101,7 @@ app.MapGet("/info", () => Results.Ok(new
 
 ILogger<Program> startupLogger = app.Services.GetRequiredService<ILogger<Program>>();
 startupLogger.LogStartingMcpServer();
-startupLogger.LogAvailableTools(string.Join(", ", tools));
+startupLogger.LogAvailableTools(tools);
 
 bool isStateless = builder.Configuration.GetValue("MCP:Stateless", defaultValue: true);
 if (isStateless)
@@ -132,7 +133,7 @@ internal static partial class ProgramLoggerExtension
         EventId = 2,
         Level = LogLevel.Information,
         Message = "Available tools: {Tools}")]
-    public static partial void LogAvailableTools(this ILogger logger, string tools);
+    public static partial void LogAvailableTools(this ILogger logger, CommaSeparatedValues tools);
 
     [LoggerMessage(
         EventId = 3,
