@@ -1,0 +1,141 @@
+name: Deploy MCP Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/**'
+      - '.github/workflows/deploy-mcp-infra.yml'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: eu-central-1
+  STACK_NAME: NixSearchMCP-API
+  DOMAIN_NAME: search.nix.mcp.playday3008.dev
+
+jobs:
+  deploy:
+    name: Deploy API Gateway Stack
+    runs-on: ubuntu-latest
+    environment: MCP on AWS Lambda
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Ensure ACM certificate exists
+        id: cert
+        run: |
+          # Check for an existing certificate for the domain
+          CERT_ARN=$(aws acm list-certificates \
+            --query "CertificateSummaryList[?DomainName=='${DOMAIN_NAME}'].CertificateArn | [0]" \
+            --output text)
+
+          if [ "$CERT_ARN" = "None" ] || [ -z "$CERT_ARN" ]; then
+            echo "Requesting new certificate for ${DOMAIN_NAME}..."
+            CERT_ARN=$(aws acm request-certificate \
+              --domain-name "${DOMAIN_NAME}" \
+              --validation-method DNS \
+              --tags Key=Name,Value=NixSearchMCP-cert \
+              --query 'CertificateArn' \
+              --output text)
+            echo "Certificate requested: ${CERT_ARN}"
+            sleep 5
+          else
+            echo "Found existing certificate: ${CERT_ARN}"
+          fi
+
+          echo "arn=${CERT_ARN}" >> "$GITHUB_OUTPUT"
+
+      - name: Check certificate validation status
+        id: validation
+        run: |
+          CERT_ARN="${{ steps.cert.outputs.arn }}"
+          STATUS=$(aws acm describe-certificate \
+            --certificate-arn "${CERT_ARN}" \
+            --query 'Certificate.Status' \
+            --output text)
+
+          echo "Certificate status: ${STATUS}"
+          echo "status=${STATUS}" >> "$GITHUB_OUTPUT"
+
+          if [ "$STATUS" != "ISSUED" ]; then
+            echo ""
+            echo "=========================================="
+            echo "Certificate is not yet validated!"
+            echo "Add this DNS record in CloudFlare:"
+            echo "=========================================="
+            aws acm describe-certificate \
+              --certificate-arn "${CERT_ARN}" \
+              --query 'Certificate.DomainValidationOptions[0].ResourceRecord' \
+              --output table
+            echo "=========================================="
+            echo ""
+            echo "After adding the record, wait for validation"
+            echo "then re-run this workflow."
+            exit 1
+          fi
+
+      - name: Delete rolled-back stack if present
+        run: |
+          STACK_STATUS=$(aws cloudformation describe-stacks \
+            --stack-name ${{ env.STACK_NAME }} \
+            --query 'Stacks[0].StackStatus' \
+            --output text 2>/dev/null || echo "DOES_NOT_EXIST")
+
+          if [ "$STACK_STATUS" = "ROLLBACK_COMPLETE" ]; then
+            echo "Deleting rolled-back stack..."
+            aws cloudformation delete-stack --stack-name ${{ env.STACK_NAME }}
+            aws cloudformation wait stack-delete-complete --stack-name ${{ env.STACK_NAME }}
+            echo "Stack deleted."
+          else
+            echo "Stack status: ${STACK_STATUS}"
+          fi
+
+      - name: Deploy CloudFormation stack
+        run: |
+          aws cloudformation deploy \
+            --template-file infra/mcp-api-gateway.yml \
+            --stack-name ${{ env.STACK_NAME }} \
+            --parameter-overrides CertificateArn=${{ steps.cert.outputs.arn }} \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset
+
+      - name: Show stack events on failure
+        if: failure()
+        run: |
+          aws cloudformation describe-stack-events \
+            --stack-name ${{ env.STACK_NAME }} \
+            --query 'StackEvents[?ResourceStatus==`CREATE_FAILED` || ResourceStatus==`UPDATE_FAILED`].[LogicalResourceId,ResourceStatusReason]' \
+            --output table
+
+      - name: Show stack outputs
+        run: |
+          echo "Stack outputs:"
+          aws cloudformation describe-stacks \
+            --stack-name ${{ env.STACK_NAME }} \
+            --query 'Stacks[0].Outputs' \
+            --output table
+
+          CNAME_TARGET=$(aws cloudformation describe-stacks \
+            --stack-name ${{ env.STACK_NAME }} \
+            --query "Stacks[0].Outputs[?OutputKey=='CustomDomainTarget'].OutputValue" \
+            --output text)
+
+          echo ""
+          echo "=========================================="
+          echo "Add this CNAME record in CloudFlare:"
+          echo "  Name:    search.nix.mcp"
+          echo "  Target:  ${CNAME_TARGET}"
+          echo "  Proxy:   OFF (DNS only / grey cloud)"
+          echo "=========================================="

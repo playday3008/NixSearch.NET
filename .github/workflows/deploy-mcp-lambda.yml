@@ -14,6 +14,7 @@ env:
   DOTNET_VERSION: '10.0.x'
   AWS_REGION: eu-central-1
   FUNCTION_NAME: NixSearchMCP
+  CUSTOM_DOMAIN: search.nix.mcp.playday3008.dev
 
 jobs:
   deploy:
@@ -21,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: MCP on AWS Lambda
-      url: https://zhyxgxr7amp6usu6o2qdeab6ja0bpybd.lambda-url.eu-central-1.on.aws/
+      url: https://${{ env.CUSTOM_DOMAIN }}/
 
     permissions:
       id-token: write
@@ -97,10 +98,22 @@ jobs:
             --query 'FunctionUrl' \
             --output text)
 
+          echo "=== Function URL ==="
           echo "Testing health endpoint..."
           curl -s "${FUNCTION_URL}health" | jq .
 
           echo "Testing info endpoint..."
           curl -s "${FUNCTION_URL}info" | jq .
 
-          echo "Deployment successful! Function URL: ${FUNCTION_URL}"
+          echo ""
+          echo "=== Custom Domain ==="
+          echo "Testing health endpoint..."
+          curl -sf "https://${{ env.CUSTOM_DOMAIN }}/health" | jq . || echo "Custom domain not yet configured — skipping"
+
+          echo "Testing info endpoint..."
+          curl -sf "https://${{ env.CUSTOM_DOMAIN }}/info" | jq . || echo "Custom domain not yet configured — skipping"
+
+          echo ""
+          echo "Deployment successful!"
+          echo "  Function URL:  ${FUNCTION_URL}"
+          echo "  Custom domain: https://${{ env.CUSTOM_DOMAIN }}/"
